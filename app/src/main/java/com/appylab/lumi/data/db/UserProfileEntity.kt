@@ -12,5 +12,7 @@ data class UserProfileEntity(
     val beautyGoals: String = "",
     val skinConcerns: String = "",
     val cameraPermissionGranted: Boolean = false,
-    val notificationPermissionGranted: Boolean = false
+    val notificationPermissionGranted: Boolean = false,
+    val displayName: String = "",
+    val photoUrl: String = ""
 )

@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "tag": "Trending now",
+    "title": "Glass Skin Look",
+    "subtitle": "Dewy, clean & radiant ✦",
+    "imageUrl": ""
+  },
+  {
+    "id": 2,
+    "tag": "Trending now",
+    "title": "Soft Glam",
+    "subtitle": "Warm tones, effortless elegance ✦",
+    "imageUrl": ""
+  },
+  {
+    "id": 3,
+    "tag": "Trending now",
+    "title": "Clean Girl Aesthetic",
+    "subtitle": "Minimal, fresh & natural",
+    "imageUrl": ""
+  },
+  {
+    "id": 4,
+    "tag": "Trending now",
+    "title": "Bold Berry Lip",
+    "subtitle": "Deep tones, statement-making",
+    "imageUrl": ""
+  },
+  {
+    "id": 5,
+    "tag": "Trending now",
+    "title": "Bronzed & Sun-Kissed",
+    "subtitle": "Golden warmth, summer glow ✦",
+    "imageUrl": ""
+  }
+]
