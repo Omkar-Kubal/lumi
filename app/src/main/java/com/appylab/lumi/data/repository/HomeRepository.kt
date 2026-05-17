@@ -65,6 +65,8 @@ class HomeRepository(
 
     suspend fun removeSavedTip(tipId: Int) = savedTipDao.remove(SavedTipEntity(tipId))
 
+    suspend fun clearResultsBadge() = updateAppState { it.copy(resultsUnviewed = false) }
+
     private suspend fun updateAppState(transform: (AppStateEntity) -> AppStateEntity) {
         val current = appStateDao.observe().first() ?: AppStateEntity()
         appStateDao.upsert(transform(current))

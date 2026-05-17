@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -68,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.appylab.lumi.data.model.BeautyTip
 import com.appylab.lumi.data.model.FaceAnalysis
 import com.appylab.lumi.data.model.SubscriptionTier
@@ -131,7 +136,10 @@ fun HomeScreen(
         onBookmarkTip = viewModel::toggleBookmark,
         onTipPageChange = viewModel::navigateTipWindow,
         onExploreLooksClick = onExploreLooksClick,
-        onResultsTabClick = onResultsTabClick,
+        onResultsTabClick = {
+            viewModel.clearResultsBadge()
+            onResultsTabClick()
+        },
         onProfileTabClick = onProfileTabClick
     )
 }
@@ -193,6 +201,7 @@ private fun HomeContent(
             Spacer(Modifier.height(16.dp))
             GreetingHeader(
                 displayName = uiState.displayName,
+                photoUrl = uiState.photoUrl,
                 greetingTime = uiState.greetingTime,
                 greetingSubtitle = uiState.greetingSubtitle,
                 unreadCount = uiState.unreadNotificationCount,
@@ -264,6 +273,7 @@ private fun HomeContent(
 @Composable
 private fun GreetingHeader(
     displayName: String,
+    photoUrl: String?,
     greetingTime: String,
     greetingSubtitle: String,
     unreadCount: Int,
@@ -282,7 +292,14 @@ private fun GreetingHeader(
                 .clickable(onClick = onAvatarClick),
             contentAlignment = Alignment.Center
         ) {
-            if (displayName.isNotEmpty()) {
+            if (!photoUrl.isNullOrEmpty()) {
+                AsyncImage(
+                    model = photoUrl,
+                    contentDescription = "Avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape)
+                )
+            } else if (displayName.isNotEmpty()) {
                 Text(
                     text = displayName.first().uppercaseChar().toString(),
                     style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
@@ -693,16 +710,53 @@ private fun TrendingSection(
     looks: List<TrendingLook>,
     onExploreLooksClick: () -> Unit
 ) {
-    val look = looks.firstOrNull() ?: return
+    if (looks.isEmpty()) return
+
+    val listState = rememberLazyListState()
+    val activeIndex = listState.firstVisibleItemIndex
 
     Text(
-        text = look.tag,
+        text = looks.first().tag,
         style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium, color = HTextMuted)
     )
     Spacer(Modifier.height(8.dp))
+
+    LazyRow(
+        state = listState,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(looks) { look ->
+            TrendingCard(look = look, onExploreLooksClick = onExploreLooksClick)
+        }
+    }
+
+    if (looks.size > 1) {
+        Spacer(Modifier.height(10.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(looks.size.coerceAtMost(5)) { index ->
+                val isActive = index == activeIndex
+                Box(
+                    modifier = Modifier
+                        .then(
+                            if (isActive) Modifier.width(14.dp).height(5.dp)
+                            else Modifier.size(5.dp)
+                        )
+                        .clip(if (isActive) RoundedCornerShape(3.dp) else CircleShape)
+                        .background(if (isActive) HTextPrimary else HBorder)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrendingCard(look: TrendingLook, onExploreLooksClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(280.dp)
             .height(162.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(
@@ -744,28 +798,6 @@ private fun TrendingSection(
                 Text(
                     text = "Explore looks",
                     style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
-                )
-            }
-        }
-
-        // Pagination dots
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 14.dp, bottom = 14.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(looks.size.coerceAtMost(5)) { index ->
-                val isActive = index == 0
-                Box(
-                    modifier = Modifier
-                        .then(
-                            if (isActive) Modifier.width(14.dp).height(5.dp)
-                            else Modifier.size(5.dp)
-                        )
-                        .clip(if (isActive) RoundedCornerShape(3.dp) else CircleShape)
-                        .background(if (isActive) HTextPrimary else HBorder)
                 )
             }
         }

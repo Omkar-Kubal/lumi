@@ -105,8 +105,7 @@ class MainActivity : ComponentActivity() {
 
                     screen == AppScreen.Scan -> ScanScreen(
                         onBack        = { screen = AppScreen.Main },
-                        onScanComplete = { screen = AppScreen.Results },
-                        onGalleryClick = { goPlaceholder("Gallery Scan", "Scanning from gallery is coming soon.") }
+                        onScanComplete = { screen = AppScreen.Results }
                     )
 
                     screen == AppScreen.Results -> PlaceholderScreen(

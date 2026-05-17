@@ -10,6 +10,9 @@ interface AppStateDao {
     @Query("SELECT * FROM app_state WHERE id = 1")
     fun observe(): Flow<AppStateEntity?>
 
+    @Query("SELECT * FROM app_state WHERE id = 1")
+    suspend fun getAppState(): AppStateEntity?
+
     @Upsert
     suspend fun upsert(state: AppStateEntity)
 }

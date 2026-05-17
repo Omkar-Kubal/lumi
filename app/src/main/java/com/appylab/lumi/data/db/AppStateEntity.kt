@@ -9,5 +9,7 @@ data class AppStateEntity(
     val subscriptionTier: String = "FREE",
     val unreadNotificationCount: Int = 0,
     val freeScanUsed: Boolean = false,
-    val resultsUnviewed: Boolean = false
+    val resultsUnviewed: Boolean = false,
+    val scanCountToday: Int = 0,
+    val scanCountDate: String = ""
 )

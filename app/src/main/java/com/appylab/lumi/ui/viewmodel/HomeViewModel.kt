@@ -132,6 +132,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun clearResultsBadge() { viewModelScope.launch { repository.clearResultsBadge() } }
+
     fun navigateTipWindow(index: Int) {
         _tipWindowIndex.value = index.coerceIn(0, (uiState.value.tipsWindow.size - 1).coerceAtLeast(0))
     }
