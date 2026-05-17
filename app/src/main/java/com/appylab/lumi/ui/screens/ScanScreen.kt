@@ -791,8 +791,6 @@ private fun ImageQualityChecklist(
             Spacer(Modifier.height(8.dp))
             ChecklistRow("Face detected", passed = faceDetected)
             Spacer(Modifier.height(6.dp))
-            ChecklistRow("Not blurry", passed = null) // always pending during live preview
-            Spacer(Modifier.height(6.dp))
             ChecklistRow("Good lighting", passed = lightingOk)
         }
     }

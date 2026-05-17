@@ -11,5 +11,9 @@ data class AppStateEntity(
     val freeScanUsed: Boolean = false,
     val resultsUnviewed: Boolean = false,
     val scanCountToday: Int = 0,
-    val scanCountDate: String = ""
+    val scanCountDate: String = "",
+    // Added v6
+    val notifScanReminders: Boolean = true,
+    val notifPromotions: Boolean = false,
+    val notifUpdates: Boolean = true
 )

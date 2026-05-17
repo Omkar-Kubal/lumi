@@ -7,6 +7,7 @@ import com.appylab.lumi.data.db.FaceAnalysisDao
 import com.appylab.lumi.data.db.SavedTipDao
 import com.appylab.lumi.data.db.SavedTipEntity
 import com.appylab.lumi.data.db.UserProfileDao
+import com.appylab.lumi.data.db.toModel
 import com.appylab.lumi.data.model.BeautyTip
 import com.appylab.lumi.data.model.FaceAnalysis
 import com.appylab.lumi.data.model.SubscriptionTier
@@ -26,21 +27,7 @@ class HomeRepository(
     fun observeUserProfile() = userProfileDao.observe()
 
     fun observeLatestScan(): Flow<FaceAnalysis?> =
-        faceAnalysisDao.getLatest().map { entity ->
-            entity?.let {
-                FaceAnalysis(
-                    id = it.id,
-                    userId = it.userId,
-                    glowUpScore = it.glowUpScore,
-                    faceShape = it.faceShape,
-                    skinTone = it.skinTone,
-                    undertone = it.undertone,
-                    eyeShape = it.eyeShape,
-                    imageUrl = it.imageUrl,
-                    timestamp = it.timestamp
-                )
-            }
-        }
+        faceAnalysisDao.getLatest().map { it?.toModel() }
 
     fun observeAppState(): Flow<AppStateEntity> =
         appStateDao.observe().map { it ?: AppStateEntity() }

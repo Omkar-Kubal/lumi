@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SavedTipEntity::class,
         AppStateEntity::class
     ],
-    version = 4,
+    version = 6,
     exportSchema = false
 )
 abstract class LumiDatabase : RoomDatabase() {
@@ -71,6 +71,27 @@ abstract class LumiDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN browType TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN noseShape TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN lipType TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN faceShapeDescription TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN undertoneDescription TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE face_analysis ADD COLUMN celebrityMatchesJson TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN email TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN location TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE app_state ADD COLUMN notifScanReminders INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE app_state ADD COLUMN notifPromotions INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE app_state ADD COLUMN notifUpdates INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
         fun getInstance(context: Context): LumiDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -78,7 +99,7 @@ abstract class LumiDatabase : RoomDatabase() {
                     LumiDatabase::class.java,
                     "lumi.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build()
                     .also { instance = it }
             }

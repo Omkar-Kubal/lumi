@@ -10,6 +10,12 @@ interface FaceAnalysisDao {
     @Query("SELECT * FROM face_analysis WHERE userId = :userId ORDER BY timestamp DESC LIMIT 1")
     fun getLatest(userId: Int = 1): Flow<FaceAnalysisEntity?>
 
+    @Query("SELECT * FROM face_analysis WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): FaceAnalysisEntity?
+
+    @Query("SELECT * FROM face_analysis WHERE userId = :userId ORDER BY timestamp DESC LIMIT :limit")
+    fun getRecent(userId: Int = 1, limit: Int = 5): Flow<List<FaceAnalysisEntity>>
+
     @Insert
     suspend fun insert(entity: FaceAnalysisEntity): Long
 }

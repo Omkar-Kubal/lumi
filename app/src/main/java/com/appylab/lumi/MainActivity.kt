@@ -16,6 +16,8 @@ import com.appylab.lumi.ui.screens.OnboardingScreen1
 import com.appylab.lumi.ui.screens.OnboardingScreen2
 import com.appylab.lumi.ui.screens.OnboardingScreen3
 import com.appylab.lumi.ui.screens.PlaceholderScreen
+import com.appylab.lumi.ui.screens.ProfileScreen
+import com.appylab.lumi.ui.screens.ResultScreen
 import com.appylab.lumi.ui.screens.ScanScreen
 import com.appylab.lumi.ui.screens.SplashScreen
 import com.appylab.lumi.ui.theme.LumiTheme
@@ -108,16 +110,16 @@ class MainActivity : ComponentActivity() {
                         onScanComplete = { screen = AppScreen.Results }
                     )
 
-                    screen == AppScreen.Results -> PlaceholderScreen(
-                        title    = "Results",
-                        subtitle = "Your scan history and analysis results will appear here.",
-                        onBack   = { screen = AppScreen.Main }
+                    screen == AppScreen.Results -> ResultScreen(
+                        onBack    = { screen = AppScreen.Main },
+                        onRescan  = { screen = AppScreen.Scan },
+                        onPaywall = { _ -> screen = AppScreen.Paywall }
                     )
 
-                    screen == AppScreen.Profile -> PlaceholderScreen(
-                        title    = "Profile",
-                        subtitle = "Manage your account, preferences, and saved tips.",
-                        onBack   = { screen = AppScreen.Main }
+                    screen == AppScreen.Profile -> ProfileScreen(
+                        onManageBilling = { screen = AppScreen.Paywall },
+                        onViewAllScans  = { screen = AppScreen.Results },
+                        onSignOut       = { screen = AppScreen.Main }
                     )
 
                     screen == AppScreen.Notifications -> PlaceholderScreen(

@@ -14,5 +14,8 @@ data class UserProfileEntity(
     val cameraPermissionGranted: Boolean = false,
     val notificationPermissionGranted: Boolean = false,
     val displayName: String = "",
-    val photoUrl: String = ""
+    val photoUrl: String = "",
+    // Added v6
+    val email: String = "",
+    val location: String = ""
 )
