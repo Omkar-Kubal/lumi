@@ -321,36 +321,42 @@ private fun ScanContent(
                         .padding(start = 16.dp, top = 8.dp)
                 )
 
-                // Distance chip — hidden when OK
-                AnimatedVisibility(
-                    visible = frameValidation.faceDetected && frameValidation.distanceStatus != DistanceStatus.OK,
-                    enter = fadeIn(tween(150)),
-                    exit = fadeOut(tween(150)),
+                // Distance chip — hidden when OK (Column gives ColumnScope for AnimatedVisibility)
+                Column(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(end = 16.dp, top = 8.dp)
                 ) {
-                    StatusChip(
-                        icon = Icons.Outlined.Face,
-                        title = if (frameValidation.distanceStatus == DistanceStatus.TOO_FAR) "Move closer" else "Move back",
-                        subtitle = "Ideal distance"
-                    )
+                    AnimatedVisibility(
+                        visible = frameValidation.faceDetected && frameValidation.distanceStatus != DistanceStatus.OK,
+                        enter = fadeIn(tween(150)),
+                        exit = fadeOut(tween(150))
+                    ) {
+                        StatusChip(
+                            icon = Icons.Outlined.Face,
+                            title = if (frameValidation.distanceStatus == DistanceStatus.TOO_FAR) "Move closer" else "Move back",
+                            subtitle = "Ideal distance"
+                        )
+                    }
                 }
 
                 // Centre chip — hidden when OK
-                AnimatedVisibility(
-                    visible = frameValidation.faceDetected && frameValidation.centreStatus == CentreStatus.OFF_CENTRE,
-                    enter = fadeIn(tween(150)),
-                    exit = fadeOut(tween(150)),
+                Column(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 16.dp)
                 ) {
-                    StatusChip(
-                        icon = Icons.Outlined.Face,
-                        title = "Center your face",
-                        subtitle = "Keep your face in the oval"
-                    )
+                    AnimatedVisibility(
+                        visible = frameValidation.faceDetected && frameValidation.centreStatus == CentreStatus.OFF_CENTRE,
+                        enter = fadeIn(tween(150)),
+                        exit = fadeOut(tween(150))
+                    ) {
+                        StatusChip(
+                            icon = Icons.Outlined.Face,
+                            title = "Center your face",
+                            subtitle = "Keep your face in the oval"
+                        )
+                    }
                 }
             }
 
