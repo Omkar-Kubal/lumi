@@ -17,4 +17,7 @@ interface SavedTipDao {
 
     @Delete
     suspend fun remove(tip: SavedTipEntity)
+
+    @Query("DELETE FROM saved_tip")
+    suspend fun deleteAll()
 }

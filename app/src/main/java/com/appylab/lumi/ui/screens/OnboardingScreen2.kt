@@ -66,15 +66,12 @@ import androidx.compose.ui.unit.sp
 import com.appylab.lumi.ui.theme.LumiTheme
 import com.appylab.lumi.ui.viewmodel.OnboardingViewModel
 
-private val Ob2Background = Color(0xFFFCFCFC)
-private val Ob2Rose = Color(0xFFFF637E)
-private val Ob2RoseCard = Color(0xFFFFF1F2)
+private val Ob2Background  = Color(0xFFFCFCFC)
+private val Ob2Rose        = Color(0xFFFF637E)
+private val Ob2RoseCard    = Color(0xFFFFF1F2)
 private val Ob2TextPrimary = Color(0xFF0A0A0A)
-private val Ob2TextMuted = Color(0xFF737373)
-private val Ob2Border = Color(0xFFE0E0E0)
-private val Ob2StepActive = Color(0xFFFF637E)
-private val Ob2StepDone = Color(0xFF0A0A0A)
-private val Ob2StepInactive = Color(0xFFD4D4D4)
+private val Ob2TextMuted   = Color(0xFF737373)
+private val Ob2Border      = Color(0xFFE0E0E0)
 
 private data class GoalOption(val id: String, val icon: ImageVector)
 private data class ConcernOption(val id: String, val icon: ImageVector)
@@ -170,8 +167,7 @@ fun OnboardingScreen2(
             Spacer(modifier = Modifier.height(12.dp))
 
             // ── Step progress indicator ───────────────────────────────────
-            StepProgressIndicator(
-                steps = listOf("Intro", "Personalization", "Access"),
+            OnboardingStepIndicator(
                 currentStep = 2,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -350,97 +346,6 @@ fun OnboardingScreen2(
                 Text(
                     text = "Continue",
                     style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                )
-            }
-        }
-    }
-}
-
-// ── Step progress indicator ───────────────────────────────────────────────────
-
-@Composable
-private fun StepProgressIndicator(
-    steps: List<String>,
-    currentStep: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        steps.forEachIndexed { index, label ->
-            val stepNum = index + 1
-            val isCompleted = stepNum < currentStep
-            val isActive = stepNum == currentStep
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Circle
-                Box(
-                    modifier = Modifier
-                        .size(26.dp)
-                        .clip(CircleShape)
-                        .background(
-                            when {
-                                isCompleted -> Ob2StepDone
-                                isActive -> Ob2StepActive
-                                else -> Ob2Background
-                            }
-                        )
-                        .then(
-                            if (!isCompleted && !isActive)
-                                Modifier.border(1.5.dp, Ob2StepInactive, CircleShape)
-                            else Modifier
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isCompleted) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.White
-                        )
-                    } else {
-                        Text(
-                            text = stepNum.toString(),
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (isActive) Color.White else Ob2StepInactive
-                            )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = label,
-                    style = TextStyle(
-                        fontSize = 9.5.sp,
-                        color = when {
-                            isActive -> Ob2StepActive
-                            isCompleted -> Ob2TextPrimary
-                            else -> Ob2TextMuted
-                        },
-                        fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
-                    )
-                )
-            }
-
-            // Connecting line between steps
-            if (index < steps.size - 1) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(1.5.dp)
-                        .padding(bottom = 14.dp) // align with circle center
-                        .background(
-                            if (isCompleted) Ob2StepDone else Ob2StepInactive,
-                            RoundedCornerShape(1.dp)
-                        )
                 )
             }
         }

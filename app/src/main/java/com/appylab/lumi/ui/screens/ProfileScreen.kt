@@ -6,6 +6,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -58,7 +62,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -110,8 +113,6 @@ private val PGreen      = Color(0xFF16A34A)
 private val PGreenBg    = Color(0xFFDCFCE7)
 private val PRed        = Color(0xFFDC2626)
 
-// Index of the Notification Preferences item in the LazyColumn
-private const val NOTIF_SECTION_INDEX = 5
 
 // Dropdown option lists
 private val SKIN_TYPE_OPTIONS = listOf("Oily", "Dry", "Combination", "Normal", "Sensitive")
@@ -125,7 +126,8 @@ private val UNDERTONE_OPTIONS  = listOf("Warm", "Cool", "Neutral")
 fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(),
     onViewAllScans: () -> Unit = {},
-    onSignOut: () -> Unit = {}
+    onSignOut: () -> Unit = {},
+    onUpgrade: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -134,13 +136,22 @@ fun ProfileScreen(
 
     val isPro = uiState.subscriptionTier == SubscriptionTier.PRO
 
-    val hasNotifPermission = remember(context) {
+    fun checkNotifPermission() =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED
         } else {
             true
         }
+
+    var hasNotifPermission by remember { mutableStateOf(checkNotifPermission()) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) hasNotifPermission = checkNotifPermission()
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(PBackground)) {
@@ -162,7 +173,7 @@ fun ProfileScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
                 IconButton(
-                    onClick = { scope.launch { listState.animateScrollToItem(NOTIF_SECTION_INDEX) } },
+                    onClick = { scope.launch { listState.animateScrollToItem(Int.MAX_VALUE) } },
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
                     Icon(Icons.Outlined.Settings, contentDescription = "Notification settings", tint = PMuted)
@@ -194,7 +205,7 @@ fun ProfileScreen(
                                 Uri.parse("https://play.google.com/store/account/subscriptions"))
                             context.startActivity(intent)
                         },
-                        onUpgrade = { viewModel.showComingSoon() }
+                        onUpgrade = onUpgrade
                     )
                 }
 
@@ -204,7 +215,7 @@ fun ProfileScreen(
                         scans = uiState.recentScans,
                         isPro = isPro,
                         onViewAll = onViewAllScans,
-                        onLockedTap = { viewModel.showComingSoon() }
+                        onLockedTap = onUpgrade
                     )
                 }
 
@@ -222,7 +233,7 @@ fun ProfileScreen(
                             isPro = isPro,
                             modifier = Modifier.weight(1f),
                             onViewAll = { viewModel.showComingSoon() },
-                            onUpgrade = { viewModel.showComingSoon() }
+                            onUpgrade = onUpgrade
                         )
                         SavedContentCard(
                             title = "Saved Palettes",
@@ -230,7 +241,7 @@ fun ProfileScreen(
                             isPro = isPro,
                             modifier = Modifier.weight(1f),
                             onViewAll = { viewModel.showComingSoon() },
-                            onUpgrade = { viewModel.showComingSoon() }
+                            onUpgrade = onUpgrade
                         )
                     }
                 }
@@ -341,7 +352,7 @@ fun ProfileScreen(
                     }
                 }
 
-                item { Spacer(Modifier.navigationBarsPadding()) }
+                item { Spacer(Modifier.navigationBarsPadding().padding(bottom = 60.dp)) }
             }
         }
 

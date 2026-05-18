@@ -10,6 +10,7 @@ import com.appylab.lumi.data.model.FaceAnalysis
 import com.appylab.lumi.data.model.SubscriptionTier
 import com.appylab.lumi.data.model.TrendingLook
 import com.appylab.lumi.data.repository.HomeRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +46,14 @@ private data class HomePrimaryData(
     val resultsUnviewed: Boolean
 )
 
+private data class HomeSecondaryData(
+    val savedIds: Set<Int>,
+    val bannerDismissed: Boolean,
+    val tipIndex: Int,
+    val tips: List<BeautyTip>,
+    val looks: List<TrendingLook>
+)
+
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = LumiDatabase.getInstance(application)
@@ -56,12 +65,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         appStateDao = db.appStateDao()
     )
 
-    private val allTips: List<BeautyTip> = repository.loadBeautyTips()
-    private val allTrendingLooks: List<TrendingLook> = repository.loadTrendingLooks()
+    private val _allTips = MutableStateFlow<List<BeautyTip>>(emptyList())
+    private val _allTrendingLooks = MutableStateFlow<List<TrendingLook>>(emptyList())
 
     // Session-only: resets on every cold start (ViewModel recreation)
     private val _bannerDismissed = MutableStateFlow(false)
     private val _tipWindowIndex = MutableStateFlow(0)
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _allTips.value = repository.loadBeautyTips()
+            _allTrendingLooks.value = repository.loadTrendingLooks()
+        }
+    }
 
     val uiState: StateFlow<HomeUiState> = combine(
         combine(
@@ -76,11 +92,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         combine(
             repository.observeSavedTipIds(),
             _bannerDismissed,
-            _tipWindowIndex
-        ) { savedIds, bannerDismissed, tipIdx ->
-            Triple(savedIds, bannerDismissed, tipIdx)
+            _tipWindowIndex,
+            _allTips,
+            _allTrendingLooks
+        ) { savedIds, bannerDismissed, tipIdx, tips, looks ->
+            HomeSecondaryData(savedIds, bannerDismissed, tipIdx, tips, looks)
         }
-    ) { primary, (savedIds, bannerDismissed, tipIdx) ->
+    ) { primary, secondary ->
         val hour = LocalTime.now().hour
         val (greetingTime, greetingSubtitle) = when {
             hour in 5..11 -> "Good morning," to "Let's enhance your natural glow"
@@ -88,10 +106,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             else -> "Good evening," to "Time for your evening routine"
         }
 
-        val tipsWindow = computeTipsWindow(primary.profile?.id ?: 1, allTips)
+        val tipsWindow = computeTipsWindow(primary.profile?.id ?: 1, secondary.tips)
 
         HomeUiState(
-            isLoading = false,
+            isLoading = secondary.tips.isEmpty(),
             displayName = primary.profile?.displayName.orEmpty(),
             photoUrl = primary.profile?.photoUrl?.takeIf { it.isNotEmpty() },
             greetingTime = greetingTime,
@@ -99,12 +117,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             unreadNotificationCount = primary.unreadCount,
             lastScan = primary.lastScan,
             subscriptionTier = primary.tier,
-            dailyTip = tipsWindow.getOrNull(tipIdx),
-            currentTipWindowIndex = tipIdx,
+            dailyTip = tipsWindow.getOrNull(secondary.tipIndex),
+            currentTipWindowIndex = secondary.tipIndex,
             tipsWindow = tipsWindow,
-            savedTipIds = savedIds,
-            trendingLooks = allTrendingLooks,
-            showUpsellBanner = primary.tier == SubscriptionTier.FREE && !bannerDismissed,
+            savedTipIds = secondary.savedIds,
+            trendingLooks = secondary.looks,
+            showUpsellBanner = primary.tier == SubscriptionTier.FREE && !secondary.bannerDismissed,
             resultsUnviewed = primary.resultsUnviewed
         )
     }.stateIn(

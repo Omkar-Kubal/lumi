@@ -65,6 +65,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val repository = ProfileRepository(
         userProfileDao = db.userProfileDao(),
         faceAnalysisDao = db.faceAnalysisDao(),
+        savedTipDao = db.savedTipDao(),
         appStateDao = db.appStateDao()
     )
 
@@ -128,11 +129,11 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun setNotifUpdates(v: Boolean) { viewModelScope.launch { repository.updateNotifUpdates(v) } }
 
     // Dialog state
-    fun requestSignOut() { _dialogs.update { it.copy(signOut = true) } }
-    fun dismissSignOut() { _dialogs.update { it.copy(signOut = false) } }
-    fun requestDelete() { _dialogs.update { it.copy(delete = true) } }
-    fun dismissDelete() { _dialogs.update { it.copy(delete = false) } }
-    fun showComingSoon() { _dialogs.update { it.copy(comingSoon = true) } }
+    fun requestSignOut()    { _dialogs.update { it.copy(signOut    = true) } }
+    fun dismissSignOut()    { _dialogs.update { it.copy(signOut    = false) } }
+    fun requestDelete()     { _dialogs.update { it.copy(delete     = true) } }
+    fun dismissDelete()     { _dialogs.update { it.copy(delete     = false) } }
+    fun showComingSoon()    { _dialogs.update { it.copy(comingSoon = true) } }
     fun dismissComingSoon() { _dialogs.update { it.copy(comingSoon = false) } }
 
     // Auth actions

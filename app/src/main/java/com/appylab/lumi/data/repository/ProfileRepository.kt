@@ -3,6 +3,7 @@ package com.appylab.lumi.data.repository
 import com.appylab.lumi.data.db.AppStateDao
 import com.appylab.lumi.data.db.AppStateEntity
 import com.appylab.lumi.data.db.FaceAnalysisDao
+import com.appylab.lumi.data.db.SavedTipDao
 import com.appylab.lumi.data.db.UserProfileDao
 import com.appylab.lumi.data.db.UserProfileEntity
 import com.appylab.lumi.data.db.toModel
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.map
 class ProfileRepository(
     private val userProfileDao: UserProfileDao,
     private val faceAnalysisDao: FaceAnalysisDao,
+    private val savedTipDao: SavedTipDao,
     private val appStateDao: AppStateDao
 ) {
     fun observeProfile(): Flow<UserProfileEntity?> = userProfileDao.observe()
@@ -68,6 +70,8 @@ class ProfileRepository(
     }
 
     suspend fun deleteAccount() {
+        faceAnalysisDao.deleteAll()
+        savedTipDao.deleteAll()
         userProfileDao.upsert(UserProfileEntity(hasCompletedOnboarding = false))
         appStateDao.upsert(AppStateEntity())
     }
@@ -76,7 +80,7 @@ class ProfileRepository(
         raw.lowercase().replaceFirstChar { it.uppercase() }
 
     private suspend fun updateAppState(transform: (AppStateEntity) -> AppStateEntity) {
-        val current = appStateDao.getAppState() ?: AppStateEntity()
+        val current = appStateDao.observe().first() ?: AppStateEntity()
         appStateDao.upsert(transform(current))
     }
 }

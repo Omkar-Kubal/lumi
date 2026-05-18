@@ -199,6 +199,12 @@ private fun ScanContent(
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> uri?.let { viewModel.onGalleryImageSelected(it) } }
 
+    // Reset stale blurCheckPassed from a previous scan so re-entering ScanScreen
+    // doesn't immediately redirect back to Results.
+    LaunchedEffect(Unit) {
+        viewModel.resetBlurCheck()
+    }
+
     // Navigate to results when analysis succeeds
     LaunchedEffect(uiState.blurCheckPassed) {
         if (uiState.blurCheckPassed == true) onScanComplete()
@@ -438,6 +444,7 @@ private fun ScanContent(
                 // Camera controls
                 CameraControlsRow(
                     allPassed = frameValidation.allPassed,
+                    onCapture = viewModel::onCapture,
                     onGalleryClick = {
                         galleryLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -817,6 +824,7 @@ private fun ChecklistRow(label: String, passed: Boolean?) {
 @Composable
 private fun CameraControlsRow(
     allPassed: Boolean,
+    onCapture: () -> Unit,
     onGalleryClick: () -> Unit,
     imageCapture: ImageCapture?,
     captureExecutor: Executor,
@@ -865,8 +873,13 @@ private fun CameraControlsRow(
                 .clip(CircleShape)
                 .background(if (allPassed) SWhite else SWhite.copy(0.45f))
                 .clickable {
-                    if (allPassed) {
-                        imageCapture?.takePicture(
+                    // Always start the analysis (mock path works regardless of frame state).
+                    // When the frame is valid and a real camera is available, also capture a
+                    // photo so onImageCaptured can run additional validation; the isLoading
+                    // guard in onCaptureValidated prevents a double-start.
+                    onCapture()
+                    if (allPassed && imageCapture != null) {
+                        imageCapture.takePicture(
                             captureExecutor,
                             object : ImageCapture.OnImageCapturedCallback() {
                                 override fun onCaptureSuccess(proxy: ImageProxy) {
@@ -880,17 +893,6 @@ private fun CameraControlsRow(
                                 }
                             }
                         )
-                    } else {
-                        coroutineScope.launch {
-                            val amp = 8f
-                            repeat(4) { i ->
-                                shakeOffset.animateTo(
-                                    if (i % 2 == 0) amp else -amp,
-                                    animationSpec = tween(55)
-                                )
-                            }
-                            shakeOffset.animateTo(0f, animationSpec = tween(55))
-                        }
                     }
                 },
             contentAlignment = Alignment.Center

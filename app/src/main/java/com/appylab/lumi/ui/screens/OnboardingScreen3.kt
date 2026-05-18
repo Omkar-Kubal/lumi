@@ -27,7 +27,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Notifications
@@ -59,6 +58,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,15 +68,13 @@ import androidx.core.content.ContextCompat
 import com.appylab.lumi.ui.theme.LumiTheme
 import com.appylab.lumi.ui.viewmodel.OnboardingViewModel
 
-private val Ob3Background = Color(0xFFFCFCFC)
-private val Ob3Rose = Color(0xFFFF637E)
-private val Ob3RoseCard = Color(0xFFFFF1F2)
+private val Ob3Background  = Color(0xFFFCFCFC)
+private val Ob3Rose        = Color(0xFFFF637E)
+private val Ob3RoseCard    = Color(0xFFFFF1F2)
 private val Ob3TextPrimary = Color(0xFF0A0A0A)
-private val Ob3TextMuted = Color(0xFF737373)
-private val Ob3Border = Color(0xFFE0E0E0)
-private val Ob3StepDone = Color(0xFF0A0A0A)
-private val Ob3StepInactive = Color(0xFFD4D4D4)
-private val Ob3MutedCard = Color(0xFFF5F5F5)
+private val Ob3TextMuted   = Color(0xFF737373)
+private val Ob3Border      = Color(0xFFE0E0E0)
+private val Ob3MutedCard   = Color(0xFFF5F5F5)
 
 @Composable
 fun OnboardingScreen3(
@@ -180,8 +178,7 @@ fun OnboardingScreen3(
             Spacer(modifier = Modifier.height(12.dp))
 
             // ── Step progress indicator ────────────────────────────────────
-            Ob3StepProgressIndicator(
-                steps = listOf("Intro", "Personalization", "Access"),
+            OnboardingStepIndicator(
                 currentStep = 3,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -197,15 +194,22 @@ fun OnboardingScreen3(
                         fontSize = 22.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Ob3TextPrimary,
-                        lineHeight = 30.sp
-                    )
+                        lineHeight = 30.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "Choose how you'd like to get started",
-                    style = TextStyle(fontSize = 13.sp, color = Ob3TextMuted)
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        color = Ob3TextMuted,
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -420,93 +424,6 @@ fun OnboardingScreen3(
                     lineHeight = 15.sp
                 )
             )
-        }
-    }
-}
-
-// ── Step progress indicator (mirrors OnboardingScreen2's private version) ──────
-
-@Composable
-private fun Ob3StepProgressIndicator(
-    steps: List<String>,
-    currentStep: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        steps.forEachIndexed { index, label ->
-            val stepNum = index + 1
-            val isCompleted = stepNum < currentStep
-            val isActive = stepNum == currentStep
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(26.dp)
-                        .clip(CircleShape)
-                        .background(
-                            when {
-                                isCompleted -> Ob3StepDone
-                                isActive -> Ob3Rose
-                                else -> Ob3Background
-                            }
-                        )
-                        .then(
-                            if (!isCompleted && !isActive)
-                                Modifier.border(1.5.dp, Ob3StepInactive, CircleShape)
-                            else Modifier
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isCompleted) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.White
-                        )
-                    } else {
-                        Text(
-                            text = stepNum.toString(),
-                            style = TextStyle(
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (isActive) Color.White else Ob3StepInactive
-                            )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = label,
-                    style = TextStyle(
-                        fontSize = 9.5.sp,
-                        color = when {
-                            isActive -> Ob3Rose
-                            isCompleted -> Ob3TextPrimary
-                            else -> Ob3TextMuted
-                        },
-                        fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
-                    )
-                )
-            }
-
-            if (index < steps.size - 1) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(1.5.dp)
-                        .padding(bottom = 14.dp)
-                        .background(
-                            if (isCompleted) Ob3StepDone else Ob3StepInactive,
-                            RoundedCornerShape(1.dp)
-                        )
-                )
-            }
         }
     }
 }

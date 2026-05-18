@@ -4,26 +4,64 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appylab.lumi.ui.screens.HomeScreen
+import com.appylab.lumi.ui.screens.NotificationsScreen
 import com.appylab.lumi.ui.screens.OnboardingScreen1
 import com.appylab.lumi.ui.screens.OnboardingScreen2
 import com.appylab.lumi.ui.screens.OnboardingScreen3
+import com.appylab.lumi.ui.screens.PaywallScreen
 import com.appylab.lumi.ui.screens.PlaceholderScreen
 import com.appylab.lumi.ui.screens.ProfileScreen
 import com.appylab.lumi.ui.screens.ResultScreen
 import com.appylab.lumi.ui.screens.ScanScreen
 import com.appylab.lumi.ui.screens.SplashScreen
 import com.appylab.lumi.ui.theme.LumiTheme
+import com.appylab.lumi.ui.viewmodel.HomeViewModel
 import com.appylab.lumi.ui.viewmodel.MainViewModel
 import com.appylab.lumi.ui.viewmodel.OnboardingViewModel
 import kotlinx.coroutines.delay
+
+private val NavRose    = Color(0xFFFF637E)
+private val NavMuted   = Color(0xFF737373)
+private val NavSurface = Color.White
 
 private enum class AppScreen {
     Splash, Onboarding1, Onboarding2, Onboarding3,
@@ -38,7 +76,9 @@ class MainActivity : ComponentActivity() {
             LumiTheme {
                 val mainViewModel: MainViewModel = viewModel()
                 val onboardingViewModel: OnboardingViewModel = viewModel()
+                val homeViewModel: HomeViewModel = viewModel()
                 val isOnboardingComplete by mainViewModel.isOnboardingComplete.collectAsState()
+                val homeUiState by homeViewModel.uiState.collectAsState()
 
                 var screen by remember { mutableStateOf(AppScreen.Splash) }
                 var placeholderTitle by remember { mutableStateOf("") }
@@ -62,84 +102,195 @@ class MainActivity : ComponentActivity() {
                     screen = AppScreen.Placeholder
                 }
 
-                when {
-                    isOnboardingComplete == null -> SplashScreen()
-                    screen == AppScreen.Splash -> SplashScreen()
+                val showBottomBar = isOnboardingComplete == true && screen !in setOf(
+                    AppScreen.Splash, AppScreen.Onboarding1, AppScreen.Onboarding2,
+                    AppScreen.Onboarding3, AppScreen.Scan
+                )
 
-                    screen == AppScreen.Onboarding1 -> OnboardingScreen1(
-                        onGetStarted = { screen = AppScreen.Onboarding2 },
-                        onSkip = {
-                            onboardingViewModel.skipOnboarding()
-                            screen = AppScreen.Main
-                        }
-                    )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        isOnboardingComplete == null -> SplashScreen()
+                        screen == AppScreen.Splash -> SplashScreen()
 
-                    screen == AppScreen.Onboarding2 -> OnboardingScreen2(
-                        viewModel = onboardingViewModel,
-                        onBack = { screen = AppScreen.Onboarding1 },
-                        onContinue = { screen = AppScreen.Onboarding3 }
-                    )
+                        screen == AppScreen.Onboarding1 -> OnboardingScreen1(
+                            onGetStarted = { screen = AppScreen.Onboarding2 }
+                        )
 
-                    screen == AppScreen.Onboarding3 -> OnboardingScreen3(
-                        viewModel = onboardingViewModel,
-                        onBack = { screen = AppScreen.Onboarding2 },
-                        onContinue = { screen = AppScreen.Main }
-                    )
+                        screen == AppScreen.Onboarding2 -> OnboardingScreen2(
+                            viewModel = onboardingViewModel,
+                            onBack = { screen = AppScreen.Onboarding1 },
+                            onContinue = { screen = AppScreen.Onboarding3 }
+                        )
 
-                    screen == AppScreen.Main -> HomeScreen(
-                        onStartScanClick    = { screen = AppScreen.Scan },
-                        onViewResultsClick  = { screen = AppScreen.Results },
-                        onFeatureTileClick  = { key ->
-                            when (key) {
-                                "color"  -> goPlaceholder("Color Analysis", "Discover your perfect colour season and palette.")
-                                "glowup" -> goPlaceholder("Glow-Up", "Personalised skincare recommendations are on their way.")
-                                "makeup" -> goPlaceholder("Makeup", "Looks crafted to enhance your unique features.")
-                                else     -> goPlaceholder(key.replaceFirstChar { it.uppercase() })
+                        screen == AppScreen.Onboarding3 -> OnboardingScreen3(
+                            viewModel = onboardingViewModel,
+                            onBack = { screen = AppScreen.Onboarding2 },
+                            onContinue = { screen = AppScreen.Main }
+                        )
+
+                        screen == AppScreen.Main -> HomeScreen(
+                            onStartScanClick     = { screen = AppScreen.Scan },
+                            onViewResultsClick   = {
+                                homeViewModel.clearResultsBadge()
+                                screen = AppScreen.Results
+                            },
+                            onFeatureTileClick   = { key ->
+                                when (key) {
+                                    "color"  -> goPlaceholder("Color Analysis", "Discover your perfect colour season and palette.")
+                                    "glowup" -> goPlaceholder("Glow-Up", "Personalised skincare recommendations are on their way.")
+                                    "makeup" -> goPlaceholder("Makeup", "Looks crafted to enhance your unique features.")
+                                    else     -> goPlaceholder(key.replaceFirstChar { it.uppercase() })
+                                }
+                            },
+                            onAvatarClick        = { screen = AppScreen.Profile },
+                            onBellClick          = { screen = AppScreen.Notifications },
+                            onUpgradeBannerClick = { screen = AppScreen.Paywall },
+                            onExploreLooksClick  = { goPlaceholder("Explore Looks", "A curated looks feed is coming soon.") }
+                        )
+
+                        screen == AppScreen.Scan -> ScanScreen(
+                            onBack         = { screen = AppScreen.Main },
+                            onScanComplete = {
+                                homeViewModel.clearResultsBadge()
+                                screen = AppScreen.Results
                             }
-                        },
-                        onAvatarClick       = { screen = AppScreen.Profile },
-                        onBellClick         = { screen = AppScreen.Notifications },
-                        onUpgradeBannerClick = { screen = AppScreen.Paywall },
-                        onExploreLooksClick = { goPlaceholder("Explore Looks", "A curated looks feed is coming soon.") },
-                        onResultsTabClick   = { screen = AppScreen.Results },
-                        onProfileTabClick   = { screen = AppScreen.Profile }
-                    )
+                        )
 
-                    screen == AppScreen.Scan -> ScanScreen(
-                        onBack        = { screen = AppScreen.Main },
-                        onScanComplete = { screen = AppScreen.Results }
-                    )
+                        screen == AppScreen.Results -> ResultScreen(
+                            onBack    = { screen = AppScreen.Main },
+                            onRescan  = { screen = AppScreen.Scan },
+                            onPaywall = { _ -> screen = AppScreen.Paywall }
+                        )
 
-                    screen == AppScreen.Results -> ResultScreen(
-                        onBack    = { screen = AppScreen.Main },
-                        onRescan  = { screen = AppScreen.Scan },
-                        onPaywall = { _ -> screen = AppScreen.Paywall }
-                    )
+                        screen == AppScreen.Profile -> ProfileScreen(
+                            onViewAllScans = { screen = AppScreen.Results },
+                            onSignOut      = { /* LaunchedEffect(isOnboardingComplete) handles redirect */ },
+                            onUpgrade      = { screen = AppScreen.Paywall }
+                        )
 
-                    screen == AppScreen.Profile -> ProfileScreen(
-                        onViewAllScans = { screen = AppScreen.Results },
-                        onSignOut      = { screen = AppScreen.Main }
-                    )
+                        screen == AppScreen.Notifications -> NotificationsScreen(
+                            onBack = { screen = AppScreen.Main },
+                            onOpen = { homeViewModel.onBellTapped() }
+                        )
 
-                    screen == AppScreen.Notifications -> PlaceholderScreen(
-                        title    = "Notifications",
-                        subtitle = "Your personalised notifications will appear here.",
-                        onBack   = { screen = AppScreen.Main }
-                    )
+                        screen == AppScreen.Paywall -> PaywallScreen(
+                            onBack = { screen = AppScreen.Main }
+                        )
 
-                    screen == AppScreen.Paywall -> PlaceholderScreen(
-                        title    = "Upgrade to Pro",
-                        subtitle = "Unlock unlimited scans, advanced insights, and personalised recommendations.",
-                        onBack   = { screen = AppScreen.Main }
-                    )
+                        screen == AppScreen.Placeholder -> PlaceholderScreen(
+                            title    = placeholderTitle,
+                            subtitle = placeholderSubtitle,
+                            onBack   = { screen = AppScreen.Main }
+                        )
+                    }
 
-                    screen == AppScreen.Placeholder -> PlaceholderScreen(
-                        title    = placeholderTitle,
-                        subtitle = placeholderSubtitle,
-                        onBack   = { screen = AppScreen.Main }
-                    )
+                    if (showBottomBar) {
+                        AppBottomBar(
+                            modifier        = Modifier.align(Alignment.BottomCenter),
+                            currentScreen   = screen,
+                            resultsUnviewed = homeUiState.resultsUnviewed,
+                            onHomeClick     = { screen = AppScreen.Main },
+                            onScanClick     = { screen = AppScreen.Scan },
+                            onResultsClick  = {
+                                homeViewModel.clearResultsBadge()
+                                screen = AppScreen.Results
+                            },
+                            onProfileClick  = { screen = AppScreen.Profile }
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AppBottomBar(
+    modifier: Modifier = Modifier,
+    currentScreen: AppScreen,
+    resultsUnviewed: Boolean,
+    onHomeClick: () -> Unit,
+    onScanClick: () -> Unit,
+    onResultsClick: () -> Unit,
+    onProfileClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier,
+        color = NavSurface,
+        shadowElevation = 12.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .height(60.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BottomNavItem(
+                icon     = Icons.Filled.Home,
+                label    = "Home",
+                selected = currentScreen == AppScreen.Main,
+                badge    = false,
+                onClick  = onHomeClick
+            )
+            BottomNavItem(
+                icon     = Icons.Outlined.CameraAlt,
+                label    = "Scan",
+                selected = false,
+                badge    = false,
+                onClick  = onScanClick
+            )
+            BottomNavItem(
+                icon     = Icons.Outlined.BarChart,
+                label    = "Results",
+                selected = currentScreen == AppScreen.Results,
+                badge    = resultsUnviewed,
+                onClick  = onResultsClick
+            )
+            BottomNavItem(
+                icon     = Icons.Outlined.Person,
+                label    = "Profile",
+                selected = currentScreen == AppScreen.Profile,
+                badge    = false,
+                onClick  = onProfileClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomNavItem(
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    badge: Boolean,
+    onClick: () -> Unit
+) {
+    BadgedBox(
+        badge = { if (badge) Badge(containerColor = NavRose) }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable(onClick = onClick)
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(24.dp),
+                tint = if (selected) NavRose else NavMuted
+            )
+            Spacer(Modifier.height(3.dp))
+            Text(
+                text = label,
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    color = if (selected) NavRose else NavMuted,
+                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+                )
+            )
         }
     }
 }

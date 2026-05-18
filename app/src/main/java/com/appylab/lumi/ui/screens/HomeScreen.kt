@@ -115,9 +115,7 @@ fun HomeScreen(
     onAvatarClick: () -> Unit = {},
     onBellClick: () -> Unit = {},
     onUpgradeBannerClick: () -> Unit = {},
-    onExploreLooksClick: () -> Unit = {},
-    onResultsTabClick: () -> Unit = {},
-    onProfileTabClick: () -> Unit = {}
+    onExploreLooksClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -135,12 +133,7 @@ fun HomeScreen(
         onUpgradeBannerDismiss = viewModel::dismissBanner,
         onBookmarkTip = viewModel::toggleBookmark,
         onTipPageChange = viewModel::navigateTipWindow,
-        onExploreLooksClick = onExploreLooksClick,
-        onResultsTabClick = {
-            viewModel.clearResultsBadge()
-            onResultsTabClick()
-        },
-        onProfileTabClick = onProfileTabClick
+        onExploreLooksClick = onExploreLooksClick
     )
 }
 
@@ -156,9 +149,7 @@ private fun HomeContent(
     onUpgradeBannerDismiss: () -> Unit,
     onBookmarkTip: (Int) -> Unit,
     onTipPageChange: (Int) -> Unit,
-    onExploreLooksClick: () -> Unit,
-    onResultsTabClick: () -> Unit,
-    onProfileTabClick: () -> Unit
+    onExploreLooksClick: () -> Unit
 ) {
     var showComingSoonDialog by remember { mutableStateOf(false) }
 
@@ -196,7 +187,7 @@ private fun HomeContent(
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 80.dp)
+                .padding(bottom = 96.dp)
         ) {
             Spacer(Modifier.height(16.dp))
             GreetingHeader(
@@ -258,13 +249,6 @@ private fun HomeContent(
             Spacer(Modifier.height(8.dp))
         }
 
-        HomeBottomBar(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            resultsUnviewed = uiState.resultsUnviewed,
-            onScanClick = onStartScanClick,
-            onResultsClick = onResultsTabClick,
-            onProfileClick = onProfileTabClick
-        )
     }
 }
 
@@ -713,7 +697,8 @@ private fun TrendingSection(
     if (looks.isEmpty()) return
 
     val listState = rememberLazyListState()
-    val activeIndex = listState.firstVisibleItemIndex
+    val displayedDots = looks.size.coerceAtMost(5)
+    val activeIndex = listState.firstVisibleItemIndex.coerceAtMost(displayedDots - 1)
 
     Text(
         text = looks.first().tag,
@@ -736,7 +721,7 @@ private fun TrendingSection(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            repeat(looks.size.coerceAtMost(5)) { index ->
+            repeat(displayedDots) { index ->
                 val isActive = index == activeIndex
                 Box(
                     modifier = Modifier
@@ -882,68 +867,6 @@ private fun UpgradeBanner(onUpgrade: () -> Unit, onDismiss: () -> Unit) {
     }
 }
 
-// ── Bottom navigation bar ─────────────────────────────────────────────────────
-
-@Composable
-private fun HomeBottomBar(
-    modifier: Modifier = Modifier,
-    resultsUnviewed: Boolean = false,
-    onScanClick: () -> Unit = {},
-    onResultsClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
-) {
-    Surface(
-        modifier = modifier,
-        color = HSurface,
-        shadowElevation = 12.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .height(60.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BottomNavItem(icon = Icons.Filled.Home,        label = "Home",    selected = true,  badge = false,            onClick = {})
-            BottomNavItem(icon = Icons.Outlined.CameraAlt, label = "Scan",    selected = false, badge = false,            onClick = onScanClick)
-            BottomNavItem(icon = Icons.Outlined.BarChart,  label = "Results", selected = false, badge = resultsUnviewed,  onClick = onResultsClick)
-            BottomNavItem(icon = Icons.Outlined.Person,    label = "Profile", selected = false, badge = false,            onClick = onProfileClick)
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(icon: ImageVector, label: String, selected: Boolean, badge: Boolean, onClick: () -> Unit) {
-    BadgedBox(
-        badge = {
-            if (badge) Badge(containerColor = HRose)
-        }
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier = Modifier.size(24.dp),
-                tint = if (selected) HRose else HTextMuted
-            )
-            Spacer(Modifier.height(3.dp))
-            Text(
-                text = label,
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    color = if (selected) HRose else HTextMuted,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
-                )
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFFFCFCFC)
 @Composable
@@ -978,9 +901,7 @@ private fun HomeScreenPreview() {
             onUpgradeBannerDismiss = {},
             onBookmarkTip = {},
             onTipPageChange = {},
-            onExploreLooksClick = {},
-            onResultsTabClick = {},
-            onProfileTabClick = {}
+            onExploreLooksClick = {}
         )
     }
 }

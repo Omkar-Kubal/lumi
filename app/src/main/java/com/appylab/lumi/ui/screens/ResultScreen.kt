@@ -89,6 +89,13 @@ private val RMuted      = Color(0xFF525252)
 private val RMutedBg    = Color(0xFFF5F5F5)
 private val RDark       = Color(0xFF0A0A0A)
 
+// ── Sub-screen navigation ─────────────────────────────────────────────────────
+private sealed class ResultSubScreen {
+    object GlowUp          : ResultSubScreen()
+    object ColorAnalysis   : ResultSubScreen()
+    object FeatureAnalysis : ResultSubScreen()
+}
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 @Composable
@@ -100,40 +107,66 @@ fun ResultScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val appContext = LocalContext.current
+    var subScreen by remember { mutableStateOf<ResultSubScreen?>(null) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(RBackground)
     ) {
-        when {
-            uiState.isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = RRose)
-                }
-            }
-
-            uiState.error == ResultError.NotFound -> {
-                ResultEmptyState(onStartScan = onRescan)
-            }
-
-            uiState.error == ResultError.LoadFailed -> {
-                ResultErrorState(onRescan = onRescan)
-            }
-
-            uiState.analysis != null -> {
-                ResultContent(
-                    analysis = uiState.analysis!!,
-                    subscriptionTier = uiState.subscriptionTier,
-                    glowUpPotential = uiState.glowUpPotential,
-                    verdictLabel = uiState.verdictLabel,
-                    verdictBody = uiState.verdictBody,
-                    isGeneratingShare = uiState.isGeneratingShareCard,
-                    onBack = onBack,
-                    onRescan = onRescan,
-                    onPaywall = onPaywall,
-                    onShare = { viewModel.shareResult(appContext) }
+        val sub = subScreen
+        if (sub != null) {
+            when (sub) {
+                ResultSubScreen.GlowUp -> GlowUpResultScreen(
+                    faceAnalysisId = uiState.analysis?.id ?: 0L,
+                    onBack     = { subScreen = null },
+                    onPaywall  = { onPaywall("glow_up") }
                 )
+                ResultSubScreen.ColorAnalysis -> ColorAnalysisScreen(
+                    skinTone = uiState.analysis?.skinTone.orEmpty(),
+                    undertone = uiState.analysis?.undertone.orEmpty(),
+                    onBack = { subScreen = null }
+                )
+                ResultSubScreen.FeatureAnalysis -> FeatureAnalysisScreen(
+                    analysis = uiState.analysis,
+                    onBack = { subScreen = null }
+                )
+            }
+        } else {
+            when {
+                uiState.isLoading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = RRose)
+                    }
+                }
+
+                uiState.error == ResultError.NotFound -> {
+                    ResultEmptyState(onStartScan = onRescan)
+                }
+
+                uiState.error == ResultError.LoadFailed -> {
+                    ResultErrorState(onRescan = onRescan)
+                }
+
+                uiState.analysis != null -> {
+                    ResultContent(
+                        analysis = uiState.analysis!!,
+                        subscriptionTier = uiState.subscriptionTier,
+                        glowUpPotential = uiState.glowUpPotential,
+                        verdictLabel = uiState.verdictLabel,
+                        verdictBody = uiState.verdictBody,
+                        isGeneratingShare = uiState.isGeneratingShareCard,
+                        onBack = onBack,
+                        onRescan = onRescan,
+                        onPaywall = onPaywall,
+                        onShare = { viewModel.shareResult(appContext) },
+                        onViewGlowUp = { subScreen = ResultSubScreen.GlowUp },
+                        onViewColorAnalysis = { subScreen = ResultSubScreen.ColorAnalysis },
+                        onViewFeatureAnalysis = { subScreen = ResultSubScreen.FeatureAnalysis }
+                    )
+                }
+
+                else -> ResultEmptyState(onStartScan = onRescan)
             }
         }
     }
@@ -152,7 +185,10 @@ private fun ResultContent(
     onBack: () -> Unit,
     onRescan: () -> Unit,
     onPaywall: (String) -> Unit,
-    onShare: () -> Unit
+    onShare: () -> Unit,
+    onViewGlowUp: () -> Unit,
+    onViewColorAnalysis: () -> Unit,
+    onViewFeatureAnalysis: () -> Unit
 ) {
     val isFree = subscriptionTier == SubscriptionTier.FREE
     val formattedDate = remember(analysis.timestamp) {
@@ -162,7 +198,6 @@ private fun ResultContent(
 
     var showRescanDialog by remember { mutableStateOf(false) }
     var showLearnMoreShape by remember { mutableStateOf<String?>(null) }
-    var showFeatureComingSoon by remember { mutableStateOf(false) }
 
     if (showRescanDialog) {
         RescanConfirmDialog(
@@ -176,10 +211,6 @@ private fun ResultContent(
             shape = showLearnMoreShape!!,
             onDismiss = { showLearnMoreShape = null }
         )
-    }
-
-    if (showFeatureComingSoon) {
-        ComingSoonSheet(onDismiss = { showFeatureComingSoon = false })
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -226,23 +257,26 @@ private fun ResultContent(
                     }
                 }
 
-                // 3. Eyes & Features
+                // 3. Color Analysis teaser
+                item { ColorAnalysisTeaserCard(onClick = onViewColorAnalysis) }
+
+                // 4. Eyes & Features
                 item {
                     EyesFeaturesCard(
                         eyeShape = analysis.eyeShape,
                         browType = analysis.browType,
                         noseShape = analysis.noseShape,
                         lipType = analysis.lipType,
-                        onDetailClick = { showFeatureComingSoon = true }
+                        onDetailClick = onViewFeatureAnalysis
                     )
                 }
 
-                // 4. Feature lock banner (FREE only)
+                // 5. Feature lock banner (FREE only)
                 if (isFree) {
                     item { FeatureLockBannerCard(onUpgrade = { onPaywall("feature_analysis") }) }
                 }
 
-                // 5. Celebrity Lookalikes (only if data present)
+                // 6. Celebrity Lookalikes (only if data present)
                 if (analysis.celebrityMatches.isNotEmpty()) {
                     item {
                         CelebrityLookalikesCard(
@@ -252,7 +286,7 @@ private fun ResultContent(
                     }
                 }
 
-                // 6. Score + Glow-Up row
+                // 7. Score + Glow-Up row
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -266,12 +300,13 @@ private fun ResultContent(
                         )
                         GlowUpPotentialCard(
                             potential = glowUpPotential,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onViewFullReport = onViewGlowUp
                         )
                     }
                 }
 
-                // 7. Share card
+                // 8. Share card
                 item {
                     ShareResultCard(
                         onShare = onShare,
@@ -281,10 +316,13 @@ private fun ResultContent(
             }
         }
 
-        // Sticky Re-scan bar (fixed above nav bar)
+        // Sticky Re-scan bar — sits above the shared bottom nav bar
         RescanBar(
             onClick = { showRescanDialog = true },
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 60.dp)
         )
     }
 }
@@ -372,7 +410,7 @@ private fun UpsellBannerCard(onUpgrade: () -> Unit) {
                 ) {
                     Text("Upgrade Now", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
                 }
-                Text("1 day free trial", style = TextStyle(fontSize = 10.sp, color = RMuted))
+                Text("7-day free trial", style = TextStyle(fontSize = 10.sp, color = RMuted))
             }
         }
     }
@@ -924,7 +962,8 @@ private fun OverallScoreCard(
 @Composable
 private fun GlowUpPotentialCard(
     potential: GlowUpPotential,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onViewFullReport: () -> Unit = {}
 ) {
     val filledCount = when (potential) { GlowUpPotential.HIGH -> 4; GlowUpPotential.MEDIUM -> 3; GlowUpPotential.LOW -> 1 }
     val badgeLabel = when (potential) { GlowUpPotential.HIGH -> "High"; GlowUpPotential.MEDIUM -> "Medium"; GlowUpPotential.LOW -> "Low" }
@@ -981,10 +1020,19 @@ private fun GlowUpPotentialCard(
         Spacer(Modifier.height(10.dp))
 
         Text(description, style = TextStyle(fontSize = 10.sp, color = RMuted, lineHeight = 14.sp))
+
+        Spacer(Modifier.height(8.dp))
+
+        TextButton(
+            onClick = onViewFullReport,
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            Text("See Full Report", style = TextStyle(fontSize = 12.sp, color = RRose, fontWeight = FontWeight.SemiBold))
+        }
     }
 }
 
-// ── 7. Share card ─────────────────────────────────────────────────────────────
+// ── 8. Share card ─────────────────────────────────────────────────────────────
 
 @Composable
 private fun ShareResultCard(onShare: () -> Unit, isGenerating: Boolean) {
@@ -1044,8 +1092,7 @@ private fun RescanBar(onClick: () -> Unit, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick() }
-                .padding(horizontal = 20.dp, vertical = 14.dp)
-                .navigationBarsPadding(),
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -1215,6 +1262,43 @@ private fun ResultErrorState(onRescan: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Re-scan", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+        }
+    }
+}
+
+// ── Color Analysis teaser ─────────────────────────────────────────────────────
+
+@Composable
+private fun ColorAnalysisTeaserCard(onClick: () -> Unit) {
+    ResultCard(modifier = Modifier.clickable { onClick() }) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Mini palette preview — 4 color circles
+            Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+                listOf(Color(0xFFD4A5A5), Color(0xFF8AA8C8), Color(0xFF7DB8A8), Color(0xFFA3A0B8)).forEach { c ->
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(c)
+                            .border(1.5.dp, Color.White, CircleShape)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Color Analysis", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText))
+                Text("Discover your most flattering colours", style = TextStyle(fontSize = 11.sp, color = RMuted))
+            }
+
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForwardIos, null,
+                tint = RMuted, modifier = Modifier.size(14.dp)
+            )
         }
     }
 }

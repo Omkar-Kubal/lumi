@@ -12,9 +12,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         UserProfileEntity::class,
         FaceAnalysisEntity::class,
         SavedTipEntity::class,
-        AppStateEntity::class
+        AppStateEntity::class,
+        GlowUpEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class LumiDatabase : RoomDatabase() {
@@ -22,6 +23,7 @@ abstract class LumiDatabase : RoomDatabase() {
     abstract fun faceAnalysisDao(): FaceAnalysisDao
     abstract fun savedTipDao(): SavedTipDao
     abstract fun appStateDao(): AppStateDao
+    abstract fun glowUpDao(): GlowUpDao
 
     companion object {
         @Volatile
@@ -101,6 +103,25 @@ abstract class LumiDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS glow_up (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        faceAnalysisId INTEGER NOT NULL,
+                        userId INTEGER NOT NULL DEFAULT 1,
+                        originalImageUrl TEXT NOT NULL DEFAULT '',
+                        glowUpImageUrl TEXT,
+                        glowUpImageStatus TEXT NOT NULL DEFAULT 'PENDING',
+                        score INTEGER NOT NULL DEFAULT 0,
+                        improvementAreasJson TEXT NOT NULL DEFAULT '[]',
+                        stepGuidesJson TEXT NOT NULL DEFAULT '[]',
+                        createdAt INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
         fun getInstance(context: Context): LumiDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -108,7 +129,11 @@ abstract class LumiDatabase : RoomDatabase() {
                     LumiDatabase::class.java,
                     "lumi.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                    .addMigrations(
+                        MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
+                        MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+                        MIGRATION_7_8
+                    )
                     .build()
                     .also { instance = it }
             }

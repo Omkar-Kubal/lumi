@@ -87,17 +87,19 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
             _isGeneratingShare.update { true }
             try {
                 val bitmap = generateShareCard(analysis, isPro)
-                withContext(Dispatchers.IO) {
+                val uri = withContext(Dispatchers.IO) {
                     val file = File(context.cacheDir, "lumi_result.jpg")
                     file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
-                    val uri = FileProvider.getUriForFile(
+                    FileProvider.getUriForFile(
                         context, "${context.packageName}.provider", file
                     )
-                    val intent = Intent(Intent.ACTION_SEND).apply {
-                        type = "image/jpeg"
-                        putExtra(Intent.EXTRA_STREAM, uri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
+                }
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "image/jpeg"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                withContext(Dispatchers.Main) {
                     context.startActivity(Intent.createChooser(intent, "Share your results"))
                 }
             } finally {

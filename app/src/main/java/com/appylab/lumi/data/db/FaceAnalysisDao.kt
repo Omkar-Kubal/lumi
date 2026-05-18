@@ -18,4 +18,11 @@ interface FaceAnalysisDao {
 
     @Insert
     suspend fun insert(entity: FaceAnalysisEntity): Long
+
+    /** All scans for the user ordered oldest → newest for progress chart */
+    @Query("SELECT * FROM face_analysis WHERE userId = :userId ORDER BY timestamp ASC")
+    suspend fun getScoreHistory(userId: Int = 1): List<FaceAnalysisEntity>
+
+    @Query("DELETE FROM face_analysis")
+    suspend fun deleteAll()
 }
