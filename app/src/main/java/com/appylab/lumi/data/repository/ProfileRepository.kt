@@ -28,6 +28,33 @@ class ProfileRepository(
     suspend fun updateNotifPromotions(value: Boolean) = updateAppState { it.copy(notifPromotions = value) }
     suspend fun updateNotifUpdates(value: Boolean) = updateAppState { it.copy(notifUpdates = value) }
 
+    suspend fun updatePersonalDetails(
+        age: Int, skinType: String, skinTone: String, undertone: String, location: String
+    ) {
+        val current = userProfileDao.observe().first() ?: UserProfileEntity()
+        userProfileDao.upsert(
+            current.copy(
+                age = age,
+                skinTypePref = skinType,
+                skinTonePref = skinTone,
+                undertonePref = undertone,
+                location = location
+            )
+        )
+    }
+
+    suspend fun prependSkinFromScan(skinTone: String, undertone: String) {
+        val current = userProfileDao.observe().first() ?: UserProfileEntity()
+        if (current.skinTonePref.isEmpty() && current.undertonePref.isEmpty()) {
+            userProfileDao.upsert(
+                current.copy(
+                    skinTonePref = toDisplayCase(skinTone),
+                    undertonePref = toDisplayCase(undertone)
+                )
+            )
+        }
+    }
+
     suspend fun signOut() {
         val current = userProfileDao.observe().first() ?: UserProfileEntity()
         userProfileDao.upsert(
@@ -39,6 +66,14 @@ class ProfileRepository(
             )
         )
     }
+
+    suspend fun deleteAccount() {
+        userProfileDao.upsert(UserProfileEntity(hasCompletedOnboarding = false))
+        appStateDao.upsert(AppStateEntity())
+    }
+
+    private fun toDisplayCase(raw: String): String =
+        raw.lowercase().replaceFirstChar { it.uppercase() }
 
     private suspend fun updateAppState(transform: (AppStateEntity) -> AppStateEntity) {
         val current = appStateDao.getAppState() ?: AppStateEntity()

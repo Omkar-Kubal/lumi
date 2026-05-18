@@ -9,6 +9,7 @@ import androidx.camera.core.CameraSelector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.appylab.lumi.data.db.AppStateEntity
+import com.appylab.lumi.data.db.FaceAnalysisEntity
 import com.appylab.lumi.data.db.LumiDatabase
 import com.appylab.lumi.data.model.FrameValidationState
 import com.appylab.lumi.data.model.ScanError
@@ -62,6 +63,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
     private val db = LumiDatabase.getInstance(app)
     private val appStateDao = db.appStateDao()
+    private val faceAnalysisDao = db.faceAnalysisDao()
 
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
@@ -328,12 +330,39 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun onAnalysisSuccess() {
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                showCancelButton = false,
-                blurCheckPassed = true
+        viewModelScope.launch(Dispatchers.IO) {
+            val mockMatches = """[
+                {"rank":1,"name":"Zoe Saldana","similarityPct":78},
+                {"rank":2,"name":"Lupita Nyong'o","similarityPct":71},
+                {"rank":3,"name":"Priyanka Chopra","similarityPct":65}
+            ]""".trimIndent()
+
+            faceAnalysisDao.insert(
+                FaceAnalysisEntity(
+                    glowUpScore           = (68..94).random(),
+                    faceShape             = listOf("OVAL","ROUND","HEART","SQUARE","DIAMOND","OBLONG","TRIANGLE").random(),
+                    faceShapeDescription  = "Your face has well-balanced proportions with naturally versatile features.",
+                    skinTone              = listOf("FAIR","LIGHT","MEDIUM","TAN","DEEP").random(),
+                    undertone             = listOf("WARM","COOL","NEUTRAL").random(),
+                    undertoneDescription  = "Your skin has a beautifully balanced mix of warm and cool tones.",
+                    eyeShape              = listOf("ALMOND","ROUND","HOODED","MONOLID","UPTURNED","DOWNTURNED").random(),
+                    browType              = listOf("DEFINED","SPARSE","ARCHED","STRAIGHT","THICK").random(),
+                    noseShape             = listOf("STRAIGHT","WIDE","NARROW","BUTTON","ROMAN").random(),
+                    lipType               = listOf("FULL","THIN","BOW_SHAPED","WIDE","HEART").random(),
+                    celebrityMatchesJson  = mockMatches,
+                    timestamp             = System.currentTimeMillis()
+                )
             )
+
+            withContext(Dispatchers.Main) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        showCancelButton = false,
+                        blurCheckPassed = true
+                    )
+                }
+            }
         }
     }
 

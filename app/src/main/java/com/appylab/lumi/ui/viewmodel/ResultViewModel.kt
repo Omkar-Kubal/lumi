@@ -75,8 +75,8 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ResultUiState()
+        started = SharingStarted.Eagerly,
+        initialValue = ResultUiState(isLoading = true)
     )
 
     fun shareResult(context: Context) {

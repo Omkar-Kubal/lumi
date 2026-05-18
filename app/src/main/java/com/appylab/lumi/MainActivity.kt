@@ -117,9 +117,8 @@ class MainActivity : ComponentActivity() {
                     )
 
                     screen == AppScreen.Profile -> ProfileScreen(
-                        onManageBilling = { screen = AppScreen.Paywall },
-                        onViewAllScans  = { screen = AppScreen.Results },
-                        onSignOut       = { screen = AppScreen.Main }
+                        onViewAllScans = { screen = AppScreen.Results },
+                        onSignOut      = { screen = AppScreen.Main }
                     )
 
                     screen == AppScreen.Notifications -> PlaceholderScreen(

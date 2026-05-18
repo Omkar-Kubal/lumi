@@ -17,5 +17,10 @@ data class UserProfileEntity(
     val photoUrl: String = "",
     // Added v6
     val email: String = "",
-    val location: String = ""
+    val location: String = "",
+    // Added v7 — personal details
+    val age: Int = 0,
+    val skinTypePref: String = "",
+    val skinTonePref: String = "",
+    val undertonePref: String = ""
 )
