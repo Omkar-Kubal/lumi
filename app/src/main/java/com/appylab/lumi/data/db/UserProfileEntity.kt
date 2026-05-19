@@ -24,5 +24,7 @@ data class UserProfileEntity(
     val skinTonePref: String = "",
     val undertonePref: String = "",
     // Added v10 — local password auth
-    val passwordHash: String? = null
+    val passwordHash: String? = null,
+    // Added v13 — session TTL
+    val lastLoginAt: Long = 0L
 )

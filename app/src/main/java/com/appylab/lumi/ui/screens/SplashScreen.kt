@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appylab.lumi.R
 import com.appylab.lumi.ui.theme.LumiTheme
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val Rose = Color(0xFFFF637E)
 private val Background = Color(0xFFFCFCFC)
@@ -66,7 +67,7 @@ fun SplashScreen() {
             Box {
                 Text(
                     text = "LUMI",
-                    style = TextStyle(
+                    style = TextStyle(fontFamily = PoppinsFont, 
                         fontSize = 34.sp,
                         fontWeight = FontWeight.Light,
                         letterSpacing = 9.sp,
@@ -88,7 +89,7 @@ fun SplashScreen() {
             // Tagline
             Text(
                 text = "Analyze  ·  Discover  ·  Glow Up",
-                style = TextStyle(
+                style = TextStyle(fontFamily = PoppinsFont, 
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.4.sp,

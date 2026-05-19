@@ -2,7 +2,6 @@ package com.appylab.lumi.ui.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.appylab.lumi.data.db.LumiDatabase
 import kotlinx.coroutines.Dispatchers
@@ -27,14 +26,12 @@ data class EmailSignUpUiState(
     val isSaving: Boolean = false
 )
 
-class EmailSignUpViewModel(
-    application: Application,
-    private val onboardingBeautyGoals: String,
-    private val onboardingSkinConcerns: String,
-    private val onboardingAgeRange: String,
-    private val onboardingCameraGranted: Boolean,
-    private val onboardingNotifGranted: Boolean
-) : AndroidViewModel(application) {
+/**
+ * Handles the email/password sign-up step in the onboarding flow.
+ * Saves email + password hash to the existing UserProfile row.
+ * Does NOT set hasCompletedOnboarding — Screen 8 owns that via finalizeOnboarding().
+ */
+class EmailSignUpViewModel(application: Application) : AndroidViewModel(application) {
 
     private val userProfileDao = LumiDatabase.getInstance(application).userProfileDao()
 
@@ -80,18 +77,23 @@ class EmailSignUpViewModel(
         _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val current = userProfileDao.observe().first() ?: return@launch
+                val current = userProfileDao.observe().first()
+                    ?: run {
+                        _events.emit("Something went wrong — please try again.")
+                        _uiState.update { it.copy(isSaving = false) }
+                        return@launch
+                    }
                 userProfileDao.upsert(
                     current.copy(
-                        email                        = state.email,
-                        passwordHash                 = state.password.sha256(),
-                        authType                     = "email",
-                        hasCompletedOnboarding       = true,
-                        beautyGoals                  = onboardingBeautyGoals,
-                        skinConcerns                 = onboardingSkinConcerns,
-                        ageRange                     = onboardingAgeRange,
-                        cameraPermissionGranted      = onboardingCameraGranted,
-                        notificationPermissionGranted = onboardingNotifGranted
+                        email        = state.email,
+                        passwordHash = state.password.sha256(),
+                        authType     = "email",
+                        // displayName defaults to the part before @ if not set
+                        displayName  = current.displayName.ifEmpty {
+                            state.email.substringBefore("@")
+                        }
+                        // hasCompletedOnboarding intentionally NOT set here —
+                        // Screen 8 calls finalizeOnboarding() for that.
                     )
                 )
                 _uiState.update { it.copy(isSaving = false) }
@@ -101,21 +103,6 @@ class EmailSignUpViewModel(
                 _events.emit("Something went wrong — please try again.")
             }
         }
-    }
-
-    class Factory(
-        private val application: Application,
-        private val beautyGoals: String,
-        private val skinConcerns: String,
-        private val ageRange: String,
-        private val cameraGranted: Boolean,
-        private val notifGranted: Boolean
-    ) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
-            EmailSignUpViewModel(
-                application, beautyGoals, skinConcerns, ageRange, cameraGranted, notifGranted
-            ) as T
     }
 }
 

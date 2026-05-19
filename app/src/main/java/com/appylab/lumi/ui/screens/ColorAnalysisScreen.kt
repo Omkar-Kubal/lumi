@@ -83,6 +83,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 private val CRose       = Color(0xFFFF637E)
@@ -541,8 +542,8 @@ internal fun ColorAnalysisScreen(
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = CText, modifier = Modifier.size(22.dp))
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Color Analysis", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = CText))
-                        Text("Discover your most flattering colors", style = TextStyle(fontSize = 11.sp, color = CMuted))
+                        Text("Color Analysis", style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = CText))
+                        Text("Discover your most flattering colors", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted))
                     }
                     IconButton(onClick = { scope.launch { shareColorCard(context, season) } }) {
                         Icon(Icons.Outlined.Share, "Share", tint = CText, modifier = Modifier.size(22.dp))
@@ -560,7 +561,7 @@ internal fun ColorAnalysisScreen(
                 ColorCard {
                     SectionTitle("Your Personal Color Palette")
                     Spacer(Modifier.height(2.dp))
-                    Text("Tap a swatch to copy its hex", style = TextStyle(fontSize = 11.sp, color = CMuted))
+                    Text("Tap a swatch to copy its hex", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted))
                     Spacer(Modifier.height(14.dp))
                     SwatchGrid(swatches = season.palette, columns = 4) { chip ->
                         if (chip.hex.isNotEmpty()) {
@@ -592,7 +593,7 @@ internal fun ColorAnalysisScreen(
                     ) {
                         Text(
                             "These colors may overwhelm your natural tones. Opt for soft, $undertoneAdj, and muted shades instead.",
-                            style = TextStyle(fontSize = 11.sp, color = CMuted, lineHeight = 16.sp)
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted, lineHeight = 16.sp)
                         )
                     }
                 }
@@ -629,14 +630,14 @@ internal fun ColorAnalysisScreen(
                                         .border(1.dp, Color.Black.copy(alpha = 0.07f), CircleShape)
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                Text(swatch.name, style = TextStyle(fontSize = 10.sp, color = CText))
+                                Text(swatch.name, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = CText))
                             }
                         }
                     }
                     ColorCard(modifier = Modifier.weight(1f)) {
                         SectionTitle("Makeup")
                         Spacer(Modifier.height(10.dp))
-                        Text("Lip", style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CMuted))
+                        Text("Lip", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CMuted))
                         Spacer(Modifier.height(5.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                             season.lipColors.forEach { swatch ->
@@ -649,7 +650,7 @@ internal fun ColorAnalysisScreen(
                             }
                         }
                         Spacer(Modifier.height(10.dp))
-                        Text("Eye", style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CMuted))
+                        Text("Eye", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CMuted))
                         Spacer(Modifier.height(5.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                             season.eyeColors.forEach { swatch ->
@@ -684,12 +685,12 @@ internal fun ColorAnalysisScreen(
                                         Spacer(Modifier.height(4.dp))
                                         Text(
                                             metal.name,
-                                            style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = CText, textAlign = TextAlign.Center),
+                                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = CText, textAlign = TextAlign.Center),
                                             textAlign = TextAlign.Center
                                         )
                                         Text(
                                             metal.descriptor,
-                                            style = TextStyle(fontSize = 8.sp, color = CMuted, textAlign = TextAlign.Center, lineHeight = 10.sp),
+                                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 8.sp, color = CMuted, textAlign = TextAlign.Center, lineHeight = 10.sp),
                                             textAlign = TextAlign.Center
                                         )
                                     }
@@ -704,7 +705,7 @@ internal fun ColorAnalysisScreen(
                             }.joinToString(", ")
                             Text(
                                 "${undertoneAdj.replaceFirstChar { it.uppercase() }}-toned metals enhance your natural glow. $metalText are your best picks!",
-                                style = TextStyle(fontSize = 11.sp, color = CMuted, lineHeight = 15.sp)
+                                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted, lineHeight = 15.sp)
                             )
                         }
                     }
@@ -729,9 +730,9 @@ internal fun ColorAnalysisScreen(
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Share Your Color Card", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
+                            Text("Share Your Color Card", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
                             Spacer(Modifier.height(2.dp))
-                            Text("Create a shareable card with your palette", style = TextStyle(fontSize = 11.sp, color = CMuted))
+                            Text("Create a shareable card with your palette", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted))
                         }
                         Icon(Icons.AutoMirrored.Outlined.ArrowForwardIos, null, tint = CMuted, modifier = Modifier.size(14.dp))
                     }
@@ -769,7 +770,7 @@ internal fun ColorAnalysisScreen(
                 Spacer(Modifier.width(8.dp))
                 Text(
                     if (isSaved) "Saved to Profile ✓" else "Save Palette to Profile",
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                 )
             }
         }
@@ -784,11 +785,11 @@ private fun SeasonResultCard(
     onSeasonTap: (Int) -> Unit
 ) {
     ColorCard {
-        Text("Your Best Season", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
+        Text("Your Best Season", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
         Spacer(Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(modifier = Modifier.weight(1.2f)) {
-                Text(season.name, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = CText))
+                Text(season.name, style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = CText))
                 Spacer(Modifier.height(6.dp))
                 Box(
                     modifier = Modifier
@@ -798,11 +799,11 @@ private fun SeasonResultCard(
                 ) {
                     Text(
                         season.traits.joinToString(" • "),
-                        style = TextStyle(fontSize = 10.sp, color = CRose, fontWeight = FontWeight.Medium)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = CRose, fontWeight = FontWeight.Medium)
                     )
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(season.description, style = TextStyle(fontSize = 11.sp, color = CMuted, lineHeight = 16.sp))
+                Text(season.description, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted, lineHeight = 16.sp))
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -811,13 +812,13 @@ private fun SeasonResultCard(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Sub Season", style = TextStyle(fontSize = 10.sp, color = CMuted))
+                    Text("Sub Season", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = CMuted))
                     Spacer(Modifier.weight(1f))
-                    Text(season.subSeason, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CText))
+                    Text(season.subSeason, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = CText))
                 }
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text("Explore Seasons", style = TextStyle(fontSize = 10.sp, color = CMuted))
+                Text("Explore Seasons", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = CMuted))
                 Spacer(Modifier.height(8.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     SeasonIconItem(0, detectedIndex, onSeasonTap, Modifier.weight(1f))
@@ -835,7 +836,7 @@ private fun SeasonResultCard(
                         .background(CYellow)
                         .padding(6.dp)
                 ) {
-                    Text("Tap a season to learn more", style = TextStyle(fontSize = 9.sp, color = CYellowText))
+                    Text("Tap a season to learn more", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = CYellowText))
                 }
             }
         }
@@ -867,7 +868,7 @@ private fun SeasonIconItem(
         Spacer(Modifier.height(2.dp))
         Text(
             SEASON_LABELS[index],
-            style = TextStyle(
+            style = TextStyle(fontFamily = PoppinsFont, 
                 fontSize = 9.sp,
                 fontWeight = if (isDetected) FontWeight.SemiBold else FontWeight.Normal,
                 color = if (isDetected) CRose else CMuted
@@ -887,20 +888,20 @@ private fun SeasonEducationContent(edu: SeasonEducation, isDetected: Boolean) {
             .padding(top = 4.dp, bottom = 24.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(edu.title, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = CText))
+            Text(edu.title, style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = CText))
             if (isDetected) {
                 Spacer(Modifier.width(8.dp))
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(CRose).padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
-                    Text("Your Season", style = TextStyle(fontSize = 9.sp, color = Color.White, fontWeight = FontWeight.SemiBold))
+                    Text("Your Season", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = Color.White, fontWeight = FontWeight.SemiBold))
                 }
             }
         }
         Spacer(Modifier.height(12.dp))
-        Text(edu.characteristics, style = TextStyle(fontSize = 13.sp, color = CMuted, lineHeight = 18.sp))
+        Text(edu.characteristics, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = CMuted, lineHeight = 18.sp))
         Spacer(Modifier.height(18.dp))
-        Text("Key Colors", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CText))
+        Text("Key Colors", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CText))
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             edu.keyColors.forEach { chip ->
@@ -910,18 +911,18 @@ private fun SeasonEducationContent(edu: SeasonEducation, isDetected: Boolean) {
                             .border(1.dp, Color.Black.copy(alpha = 0.07f), CircleShape)
                     )
                     Spacer(Modifier.height(4.dp))
-                    Text(chip.name, style = TextStyle(fontSize = 9.sp, color = CMuted, textAlign = TextAlign.Center))
+                    Text(chip.name, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = CMuted, textAlign = TextAlign.Center))
                 }
             }
         }
         Spacer(Modifier.height(18.dp))
-        Text("Famous ${edu.title} Celebrities", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CText))
+        Text("Famous ${edu.title} Celebrities", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CText))
         Spacer(Modifier.height(8.dp))
         edu.celebrities.forEach { celeb ->
             Row(modifier = Modifier.padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(CRose))
                 Spacer(Modifier.width(8.dp))
-                Text(celeb, style = TextStyle(fontSize = 12.sp, color = CMuted))
+                Text(celeb, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = CMuted))
             }
         }
     }
@@ -937,7 +938,7 @@ private fun AvoidInfoContent(avoidColors: List<ColorChip>) {
             .padding(horizontal = 20.dp)
             .padding(top = 4.dp, bottom = 24.dp)
     ) {
-        Text("Why Avoid These Colors?", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = CText))
+        Text("Why Avoid These Colors?", style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = CText))
         Spacer(Modifier.height(16.dp))
         avoidColors.forEach { chip ->
             Row(
@@ -950,9 +951,9 @@ private fun AvoidInfoContent(avoidColors: List<ColorChip>) {
                 )
                 Spacer(Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(chip.name, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
+                    Text(chip.name, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
                     Spacer(Modifier.height(3.dp))
-                    Text(chip.reason, style = TextStyle(fontSize = 11.sp, color = CMuted, lineHeight = 15.sp))
+                    Text(chip.reason, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = CMuted, lineHeight = 15.sp))
                 }
             }
         }
@@ -1000,13 +1001,13 @@ private fun SwatchItem(
         Spacer(Modifier.height(4.dp))
         Text(
             swatch.name,
-            style = TextStyle(fontSize = 9.sp, color = CMuted, textAlign = TextAlign.Center, lineHeight = 11.sp),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = CMuted, textAlign = TextAlign.Center, lineHeight = 11.sp),
             textAlign = TextAlign.Center
         )
         if (showHex && swatch.hex.isNotEmpty()) {
             Text(
                 swatch.hex,
-                style = TextStyle(fontSize = 8.sp, color = Color(0xFFAAAAAA), textAlign = TextAlign.Center)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 8.sp, color = Color(0xFFAAAAAA), textAlign = TextAlign.Center)
             )
         }
     }
@@ -1014,7 +1015,7 @@ private fun SwatchItem(
 
 @Composable
 private fun SectionTitle(text: String) {
-    Text(text, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
+    Text(text, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = CText))
 }
 
 @Composable

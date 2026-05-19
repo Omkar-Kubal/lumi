@@ -34,7 +34,6 @@ import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.CenterFocusWeak
-import androidx.compose.material.icons.outlined.Checkroom
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.EmojiEvents
@@ -55,9 +54,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,6 +75,7 @@ import com.appylab.lumi.data.model.TrendingLook
 import com.appylab.lumi.ui.theme.LumiTheme
 import com.appylab.lumi.ui.viewmodel.HomeUiState
 import com.appylab.lumi.ui.viewmodel.HomeViewModel
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val HBackground  = Color(0xFFFCFCFC)
 private val HRose        = Color(0xFFFF637E)
@@ -99,10 +96,9 @@ private data class FeatureTile(
 )
 
 private val featureTiles = listOf(
-    FeatureTile(Icons.Outlined.Palette,     HRose,             Color(0xFFFFF1F2), "Color",   "Find your perfect season & tones",            "color"),
-    FeatureTile(Icons.Outlined.AutoAwesome, HAmber,            Color(0xFFFFFBEB), "Glow-Up", "Personalised skincare recommendations",        "glowup"),
-    FeatureTile(Icons.Outlined.Face,        Color(0xFFEC4899), Color(0xFFFDF2F8), "Feature Analysis", "In-depth analysis of your facial features", "features"),
-    FeatureTile(Icons.Outlined.Checkroom,   Color(0xFF6366F1), Color(0xFFF5F3FF), "Style",   "Outfits that fit your vibe & body",           "style"),
+    FeatureTile(Icons.Outlined.Palette,     HRose,             Color(0xFFFFF1F2), "Color",           "Find your perfect season & tones",          "color"),
+    FeatureTile(Icons.Outlined.AutoAwesome, HAmber,            Color(0xFFFFFBEB), "Glow-Up",         "Personalised skincare recommendations",      "glowup"),
+    FeatureTile(Icons.Outlined.Face,        Color(0xFFEC4899), Color(0xFFFDF2F8), "Feature Analysis","In-depth analysis of your facial features",  "features"),
 )
 
 @Composable
@@ -142,31 +138,6 @@ private fun HomeContent(
     onBookmarkTip: (Int) -> Unit,
     onTipPageChange: (Int) -> Unit
 ) {
-    var showComingSoonDialog by remember { mutableStateOf(false) }
-
-    if (showComingSoonDialog) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showComingSoonDialog = false },
-            title = {
-                Text(
-                    "Style — Coming Soon",
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
-                )
-            },
-            text = {
-                Text(
-                    "Style recommendations are on the way. We're crafting outfits tailored to your vibe and body — stay tuned!",
-                    style = TextStyle(fontSize = 13.sp, color = HTextMuted, lineHeight = 20.sp)
-                )
-            },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = { showComingSoonDialog = false }) {
-                    Text("Got it", style = TextStyle(color = HRose, fontWeight = FontWeight.SemiBold))
-                }
-            },
-            shape = RoundedCornerShape(16.dp)
-        )
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -203,12 +174,7 @@ private fun HomeContent(
             }
 
             Spacer(Modifier.height(24.dp))
-            FeatureTilesGrid(
-                onTileClick = { key ->
-                    if (key == "style") showComingSoonDialog = true
-                    else onFeatureTileClick(key)
-                }
-            )
+            FeatureTilesGrid(onTileClick = onFeatureTileClick)
             Spacer(Modifier.height(24.dp))
 
             if (uiState.dailyTip != null) {
@@ -262,7 +228,7 @@ private fun GreetingHeader(
             } else if (displayName.isNotEmpty()) {
                 Text(
                     text = displayName.first().uppercaseChar().toString(),
-                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
                 )
             } else {
                 Icon(
@@ -280,7 +246,7 @@ private fun GreetingHeader(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = greetingTime.ifEmpty { "Hello," },
-                    style = TextStyle(fontSize = 12.sp, color = HTextMuted)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = HTextMuted)
                 )
                 Spacer(Modifier.width(4.dp))
                 Icon(
@@ -293,12 +259,12 @@ private fun GreetingHeader(
             if (displayName.isNotEmpty()) {
                 Text(
                     text = displayName,
-                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = HTextPrimary, lineHeight = 26.sp)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = HTextPrimary, lineHeight = 26.sp)
                 )
             }
             Text(
                 text = greetingSubtitle.ifEmpty { "Welcome back" },
-                style = TextStyle(fontSize = 12.sp, color = HTextMuted)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = HTextMuted)
             )
         }
 
@@ -344,7 +310,7 @@ private fun ScanCtaButton(onClick: () -> Unit) {
         Spacer(Modifier.width(8.dp))
         Text(
             text = "Start your scan",
-            style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         )
     }
 }
@@ -360,7 +326,7 @@ private fun SectionLabel(title: String, actionText: String? = null, onActionClic
     ) {
         Text(
             text = title,
-            style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
         )
         if (actionText != null) {
             Row(
@@ -369,7 +335,7 @@ private fun SectionLabel(title: String, actionText: String? = null, onActionClic
             ) {
                 Text(
                     text = actionText,
-                    style = TextStyle(fontSize = 12.sp, color = HTextMuted)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = HTextMuted)
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
@@ -413,12 +379,12 @@ private fun NoScanCard(onStartScanClick: () -> Unit) {
             Spacer(Modifier.height(12.dp))
             Text(
                 text = "No scan yet",
-                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Tap Start your scan to begin",
-                style = TextStyle(fontSize = 12.sp, color = HTextMuted)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = HTextMuted)
             )
             Spacer(Modifier.height(14.dp))
             Button(
@@ -430,7 +396,7 @@ private fun NoScanCard(onStartScanClick: () -> Unit) {
             ) {
                 Text(
                     text = "Start your scan",
-                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                 )
             }
         }
@@ -472,17 +438,17 @@ private fun ScanSummaryCard(scan: FaceAnalysis, onViewResultsClick: () -> Unit) 
                 Column {
                     Text(
                         text = "Glow Score",
-                        style = TextStyle(fontSize = 11.sp, color = HTextMuted)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = HTextMuted)
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "${scan.glowUpScore} / 100",
-                        style = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.Bold, color = HTextPrimary, lineHeight = 30.sp)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = HTextPrimary, lineHeight = 30.sp)
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = verdict,
-                        style = TextStyle(fontSize = 11.sp, color = HTextMuted)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = HTextMuted)
                     )
                 }
             }
@@ -511,8 +477,8 @@ private fun ScanMetric(icon: ImageVector, label: String, value: String) {
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(15.dp), tint = HTextMuted)
-        Text(label, style = TextStyle(fontSize = 9.sp, color = HTextMuted))
-        Text(value, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary))
+        Text(label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = HTextMuted))
+        Text(value, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary))
     }
 }
 
@@ -579,12 +545,12 @@ private fun FeatureTileCard(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = tile.title,
-                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = tile.subtitle,
-                    style = TextStyle(fontSize = 10.sp, color = HTextMuted, lineHeight = 14.sp)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = HTextMuted, lineHeight = 14.sp)
                 )
             }
         }
@@ -615,7 +581,7 @@ private fun DailyBeautyTipCard(
             ) {
                 Text(
                     text = "Daily beauty tip",
-                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
                 )
                 IconButton(
                     onClick = onBookmark,
@@ -632,7 +598,7 @@ private fun DailyBeautyTipCard(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = tip.text,
-                style = TextStyle(fontSize = 12.sp, color = HTextMuted, lineHeight = 18.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = HTextMuted, lineHeight = 18.sp)
             )
             Spacer(Modifier.height(12.dp))
             Row(
@@ -672,7 +638,7 @@ private fun TrendingSection(
 
     Text(
         text = looks.first().tag,
-        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium, color = HTextMuted)
+        style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = HTextMuted)
     )
     Spacer(Modifier.height(8.dp))
 
@@ -736,11 +702,11 @@ private fun TrendingCard(look: TrendingLook, onExploreLooksClick: () -> Unit) {
         ) {
             Text(
                 text = look.title,
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = HTextPrimary)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = HTextPrimary)
             )
             Text(
                 text = look.subtitle,
-                style = TextStyle(fontSize = 11.sp, color = HTextMuted)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = HTextMuted)
             )
             Spacer(Modifier.height(10.dp))
             Button(
@@ -752,7 +718,7 @@ private fun TrendingCard(look: TrendingLook, onExploreLooksClick: () -> Unit) {
             ) {
                 Text(
                     text = "Explore looks",
-                    style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                 )
             }
         }
@@ -794,12 +760,12 @@ private fun UpgradeBanner(onUpgrade: () -> Unit, onDismiss: () -> Unit) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Unlock your full glow",
-                        style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HTextPrimary)
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "Get advanced insights, saved scans, and personalised recommendations.",
-                        style = TextStyle(fontSize = 10.sp, color = HTextMuted, lineHeight = 14.sp)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = HTextMuted, lineHeight = 14.sp)
                     )
                 }
 
@@ -814,7 +780,7 @@ private fun UpgradeBanner(onUpgrade: () -> Unit, onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = "Upgrade",
-                        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                     )
                 }
             }
@@ -867,11 +833,8 @@ private fun HomeScreenPreview() {
             onFeatureTileClick = {},
             onAvatarClick = {},
             onBellClick = {},
-            onUpgradeBannerClick = {},
-            onUpgradeBannerDismiss = {},
             onBookmarkTip = {},
-            onTipPageChange = {},
-            onExploreLooksClick = {}
+            onTipPageChange = {}
         )
     }
 }

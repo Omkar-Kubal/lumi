@@ -16,9 +16,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         GlowUpEntity::class,
         ColorAnalysisEntity::class,
         FeatureDetailEntity::class,
-        NotificationEntity::class
+        NotificationEntity::class,
+        OnboardingProgressEntity::class
     ],
-    version = 11,
+    version = 13,
     exportSchema = false
 )
 abstract class LumiDatabase : RoomDatabase() {
@@ -30,6 +31,7 @@ abstract class LumiDatabase : RoomDatabase() {
     abstract fun colorAnalysisDao(): ColorAnalysisDao
     abstract fun featureDetailDao(): FeatureDetailDao
     abstract fun notificationDao(): NotificationDao
+    abstract fun onboardingProgressDao(): OnboardingProgressDao
 
     companion object {
         @Volatile
@@ -177,6 +179,24 @@ abstract class LumiDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS onboarding_progress (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        currentStep INTEGER NOT NULL DEFAULT 1,
+                        updatedAt INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
+        private val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN lastLoginAt INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): LumiDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -188,7 +208,7 @@ abstract class LumiDatabase : RoomDatabase() {
                         MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
                         MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
                         MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11
+                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13
                     )
                     .build()
                     .also { instance = it }

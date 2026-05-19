@@ -114,6 +114,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 private val GRose       = Color(0xFFFF637E)
@@ -254,9 +255,9 @@ private fun GlowUpContent(
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Feature Glow Up",
-                            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = GText))
                         Text("See your transformation and track your progress",
-                            style = TextStyle(fontSize = 11.sp, color = GMuted, textAlign = TextAlign.Center))
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted, textAlign = TextAlign.Center))
                     }
                     IconButton(onClick = {
                         scope.launch {
@@ -383,13 +384,13 @@ private fun BeforeAfterCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Before / After Comparison",
-                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
             IconButton(onClick = onInfoClick, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Outlined.Info, null, tint = GMuted, modifier = Modifier.size(16.dp))
             }
         }
         Text("Drag the slider to compare",
-            style = TextStyle(fontSize = 11.sp, color = GMuted))
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted))
         Spacer(Modifier.height(12.dp))
 
         Box(
@@ -467,7 +468,7 @@ private fun BeforeAfterCard(
                     .clip(RoundedCornerShape(6.dp))
                     .background(Color.Black.copy(alpha = 0.55f))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) { Text("Before", style = TextStyle(fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)) }
+            ) { Text("Before", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)) }
 
             Box(
                 modifier = Modifier
@@ -475,13 +476,13 @@ private fun BeforeAfterCard(
                     .clip(RoundedCornerShape(6.dp))
                     .background(GRose.copy(alpha = 0.85f))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) { Text("After (AI Glow-Up)", style = TextStyle(fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)) }
+            ) { Text("After (AI Glow-Up)", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)) }
         }
 
         Spacer(Modifier.height(8.dp))
         Text(
             "AI-generated glow-up using your personalised recommendations.",
-            style = TextStyle(fontSize = 10.sp, color = GMuted, textAlign = TextAlign.Center),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = GMuted, textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -524,7 +525,7 @@ private fun GeneratingPlaceholder() {
             CircularProgressIndicator(color = GRose, modifier = Modifier.size(28.dp), strokeWidth = 2.dp)
             Spacer(Modifier.height(8.dp))
             Text("Generating your glow-up…",
-                style = TextStyle(fontSize = 11.sp, color = GDark, fontWeight = FontWeight.Medium))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GDark, fontWeight = FontWeight.Medium))
         }
     }
 }
@@ -533,12 +534,12 @@ private fun GeneratingPlaceholder() {
 private fun FailedPlaceholder(onRetry: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(GMutedBg), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Generation failed", style = TextStyle(fontSize = 12.sp, color = GMuted))
+            Text("Generation failed", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = GMuted))
             Spacer(Modifier.height(8.dp))
             OutlinedButton(onClick = onRetry, shape = RoundedCornerShape(8.dp)) {
                 Icon(Icons.Outlined.Refresh, null, modifier = Modifier.size(14.dp), tint = GRose)
                 Spacer(Modifier.width(4.dp))
-                Text("Retry", style = TextStyle(fontSize = 12.sp, color = GRose))
+                Text("Retry", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = GRose))
             }
         }
     }
@@ -550,7 +551,7 @@ private fun GlowImagePlaceholder(label: String, modifier: Modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.Person, null, tint = GMuted, modifier = Modifier.size(32.dp))
             Spacer(Modifier.height(4.dp))
-            Text(label, style = TextStyle(fontSize = 11.sp, color = GMuted, fontWeight = FontWeight.SemiBold))
+            Text(label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted, fontWeight = FontWeight.SemiBold))
         }
     }
 }
@@ -577,15 +578,15 @@ private fun GlowScoreCard(score: Int, scoreDelta: Int?, label: String, body: Str
                     drawArc(GRose, -90f, 360f * animatedProgress, false, style = stroke)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("$score", style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = GText))
-                    Text("/100", style = TextStyle(fontSize = 9.sp, color = GMuted))
+                    Text("$score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = GText))
+                    Text("/100", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = GMuted))
                 }
             }
 
             Column(Modifier.weight(1f)) {
-                Text(label, style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = GText))
+                Text(label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = GText))
                 Spacer(Modifier.height(2.dp))
-                Text(body, style = TextStyle(fontSize = 11.sp, color = GMuted))
+                Text(body, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted))
                 Spacer(Modifier.height(8.dp))
                 if (scoreDelta != null) {
                     val (bgColor, fgColor, prefix) = when {
@@ -600,7 +601,7 @@ private fun GlowScoreCard(score: Int, scoreDelta: Int?, label: String, body: Str
                             .background(bgColor)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text(text, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = fgColor))
+                        Text(text, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = fgColor))
                     }
                 }
             }
@@ -624,7 +625,7 @@ private fun ImprovementAreasCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Improvement Areas (Priority)",
-                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
             IconButton(onClick = onInfoClick, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Outlined.Info, null, tint = GMuted, modifier = Modifier.size(16.dp))
             }
@@ -674,7 +675,7 @@ private fun ImprovementAreaCard(area: ImprovementArea, isSelected: Boolean, onCl
         Spacer(Modifier.height(8.dp))
         Text(
             area.area,
-            style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText),
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(4.dp))
@@ -684,11 +685,11 @@ private fun ImprovementAreaCard(area: ImprovementArea, isSelected: Boolean, onCl
                 .background(impactColor.copy(alpha = 0.12f))
                 .padding(horizontal = 6.dp, vertical = 2.dp)
         ) {
-            Text(impactLabel, style = TextStyle(fontSize = 9.sp, color = impactColor, fontWeight = FontWeight.SemiBold))
+            Text(impactLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = impactColor, fontWeight = FontWeight.SemiBold))
         }
         if (area.scorePotential > 0) {
             Spacer(Modifier.height(3.dp))
-            Text("+${area.scorePotential} potential", style = TextStyle(fontSize = 10.sp, color = GRose))
+            Text("+${area.scorePotential} potential", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = GRose))
         }
     }
 }
@@ -705,7 +706,7 @@ private fun StepGuideCard(
     GlowCard(padding = 0.dp) {
         Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Text("Actionable Step Guide",
-                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
         }
         Spacer(Modifier.height(8.dp))
 
@@ -722,7 +723,7 @@ private fun StepGuideCard(
                         selected = selectedTabIndex == index,
                         onClick  = { onTabSelect(name) },
                         text = {
-                            Text(name, style = TextStyle(
+                            Text(name, style = TextStyle(fontFamily = PoppinsFont, 
                                 fontSize   = 12.sp,
                                 fontWeight = if (selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal,
                                 color      = if (selectedTabIndex == index) GRose else GMuted
@@ -766,14 +767,14 @@ private fun StepGuideContent(guide: StepGuide) {
         Spacer(Modifier.height(14.dp))
 
         if (guide.goal.isNotBlank()) {
-            Text("Your Goal", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = GText))
+            Text("Your Goal", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = GText))
             Spacer(Modifier.height(4.dp))
-            Text(guide.goal, style = TextStyle(fontSize = 12.sp, color = GMuted, lineHeight = 17.sp))
+            Text(guide.goal, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = GMuted, lineHeight = 17.sp))
             Spacer(Modifier.height(12.dp))
         }
         if (guide.recommendations.isNotEmpty()) {
             Text("Top Recommendations",
-                style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = GText))
             Spacer(Modifier.height(8.dp))
             guide.recommendations.forEach { rec ->
                 RecommendationRow(text = rec)
@@ -797,7 +798,7 @@ private fun RecommendationRow(text: String) {
     ) {
         Icon(Icons.Outlined.CheckCircle, null, tint = GRose,
             modifier = Modifier.size(16.dp).padding(top = 1.dp))
-        Text(text, style = TextStyle(fontSize = 11.sp, color = GText, lineHeight = 15.sp))
+        Text(text, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GText, lineHeight = 15.sp))
     }
 }
 
@@ -815,12 +816,12 @@ private fun ProgressTrackerCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Progress Tracker",
-                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = GText))
             IconButton(onClick = onInfoClick, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Outlined.Info, null, tint = GMuted, modifier = Modifier.size(16.dp))
             }
         }
-        Text("Your glow-up journey over time", style = TextStyle(fontSize = 11.sp, color = GMuted))
+        Text("Your glow-up journey over time", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted))
         Spacer(Modifier.height(16.dp))
         ProgressChart(dataPoints = progressData)
         Spacer(Modifier.height(8.dp))
@@ -830,10 +831,10 @@ private fun ProgressTrackerCard(
             delta.toFloat() / (totalScans - 1)
         } else null
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Total Scans: $totalScans", style = TextStyle(fontSize = 11.sp, color = GMuted))
+            Text("Total Scans: $totalScans", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted))
             Text(
                 if (avgImprovement != null) "Avg: +%.1f/scan".format(avgImprovement) else "Avg: —",
-                style = TextStyle(fontSize = 11.sp, color = GMuted)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GMuted)
             )
         }
     }
@@ -844,7 +845,7 @@ private val DATE_FMT = SimpleDateFormat("MMM d", Locale.getDefault())
 @Composable
 private fun ProgressChart(dataPoints: List<ScanScorePoint>) {
     val textMeasurer = rememberTextMeasurer()
-    val labelStyle = TextStyle(fontSize = 9.sp, color = GMuted)
+    val labelStyle = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = GMuted)
 
     Canvas(modifier = Modifier.fillMaxWidth().height(130.dp)) {
         val leftPad  = 32.dp.toPx()
@@ -900,7 +901,7 @@ private fun ProgressChart(dataPoints: List<ScanScorePoint>) {
         dataPoints.forEach { sp ->
             Text(
                 DATE_FMT.format(Date(sp.date)),
-                style = TextStyle(fontSize = 8.sp, color = GMuted, textAlign = TextAlign.Center),
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 8.sp, color = GMuted, textAlign = TextAlign.Center),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
@@ -955,20 +956,20 @@ private fun SharePreviewCard(
                         .background(GRose)
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
-                    Text("$score", style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.White))
+                    Text("$score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.White))
                 }
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("My Glow-Up Score", style = TextStyle(fontSize = 10.sp, color = GMuted))
-                Text("$score / 100", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = GText))
+                Text("My Glow-Up Score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = GMuted))
+                Text("$score / 100", style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = GText))
                 if (scoreDelta != null && scoreDelta != 0) {
                     val deltaColor = if (scoreDelta > 0) Color(0xFF2E7D32) else Color(0xFFC62828)
                     val prefix = if (scoreDelta > 0) "+" else ""
-                    Text("$prefix$scoreDelta vs last scan", style = TextStyle(fontSize = 10.sp, color = deltaColor))
+                    Text("$prefix$scoreDelta vs last scan", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = deltaColor))
                 }
-                Text(verdictLabel, style = TextStyle(fontSize = 11.sp, color = GRose))
-                Text("Generated by Lumi", style = TextStyle(fontSize = 9.sp, color = GMuted))
+                Text(verdictLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = GRose))
+                Text("Generated by Lumi", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = GMuted))
             }
 
             // Mini share card preview
@@ -1024,7 +1025,7 @@ private fun StickyShareBar(
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(10.dp))
                 Text("Generating…",
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                         color = if (shareReady) Color.White else GMuted))
             } else {
                 Icon(
@@ -1036,7 +1037,7 @@ private fun StickyShareBar(
                 Text(
                     if (shareReady) "Generate & Share Card"
                     else "Share in Progress — image generating",
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                         color = if (shareReady) Color.White else GMuted)
                 )
             }
@@ -1055,9 +1056,9 @@ private fun GlowInfoSheet(title: String, body: String) {
             .padding(horizontal = 20.dp)
             .padding(top = 8.dp, bottom = 24.dp)
     ) {
-        Text(title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = GText))
+        Text(title, style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = GText))
         Spacer(Modifier.height(10.dp))
-        Text(body, style = TextStyle(fontSize = 13.sp, color = GMuted, lineHeight = 20.sp))
+        Text(body, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = GMuted, lineHeight = 20.sp))
     }
 }
 
@@ -1182,11 +1183,11 @@ private fun GlowUpEmptyState(onBack: () -> Unit) {
             Icon(Icons.Outlined.AutoAwesome, null, tint = GRose, modifier = Modifier.size(56.dp))
             Spacer(Modifier.height(16.dp))
             Text("No glow-up yet",
-                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = GText))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = GText))
             Spacer(Modifier.height(8.dp))
             Text(
                 "Complete a scan to see your AI-powered glow-up transformation.",
-                style = TextStyle(fontSize = 13.sp, color = GMuted, textAlign = TextAlign.Center)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = GMuted, textAlign = TextAlign.Center)
             )
             Spacer(Modifier.height(24.dp))
             OutlinedButton(onClick = onBack, shape = RoundedCornerShape(10.dp)) {

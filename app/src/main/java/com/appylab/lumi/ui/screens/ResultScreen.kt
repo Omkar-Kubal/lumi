@@ -78,6 +78,7 @@ import com.appylab.lumi.ui.viewmodel.ResultViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 private val RRose       = Color(0xFFFF637E)
@@ -221,7 +222,7 @@ private fun ResultContent(
             LazyColumn(
                 contentPadding = PaddingValues(
                     start = 16.dp, end = 16.dp,
-                    top = 12.dp, bottom = 96.dp
+                    top = 12.dp, bottom = 8.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
@@ -296,16 +297,12 @@ private fun ResultContent(
                     )
                 }
             }
-        }
 
-        // Sticky Re-scan bar — sits above the shared bottom nav bar
-        RescanBar(
-            onClick = { showRescanDialog = true },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(bottom = 60.dp)
-        )
+            // Sticky Re-scan bar — in layout flow so it never overlaps the list
+            RescanBar(onClick = { showRescanDialog = true })
+            // Clear the app bottom nav bar (60 dp) + system nav bar
+            Spacer(Modifier.navigationBarsPadding().height(60.dp))
+        }
     }
 }
 
@@ -335,11 +332,11 @@ private fun ResultTopBar(
         ) {
             Text(
                 "Your Results",
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = RText)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = RText)
             )
             Text(
                 dateText,
-                style = TextStyle(fontSize = 11.sp, color = RMuted)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted)
             )
         }
 
@@ -373,11 +370,11 @@ private fun UpsellBannerCard(onUpgrade: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     "Unlock your full analysis",
-                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText)
                 )
                 Text(
                     "Get detailed insights, personalized recommendations & more.",
-                    style = TextStyle(fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
                 )
             }
 
@@ -390,9 +387,9 @@ private fun UpsellBannerCard(onUpgrade: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = RDark),
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                 ) {
-                    Text("Upgrade Now", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                    Text("Upgrade Now", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
                 }
-                Text("7-day free trial", style = TextStyle(fontSize = 10.sp, color = RMuted))
+                Text("7-day free trial", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = RMuted))
             }
         }
     }
@@ -414,7 +411,7 @@ private fun FaceShapeCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Face Shape", style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
+            Text("Face Shape", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
             if (shape.isNotEmpty()) {
                 Box(
                     modifier = Modifier
@@ -422,7 +419,7 @@ private fun FaceShapeCard(
                         .background(RRose)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
-                    Text("Detected", style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                    Text("Detected", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
                 }
             }
         }
@@ -441,7 +438,7 @@ private fun FaceShapeCard(
 
         Text(
             shape.lowercase().replaceFirstChar { it.uppercase() }.ifEmpty { "—" },
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RText),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RText),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -449,7 +446,7 @@ private fun FaceShapeCard(
             Spacer(Modifier.height(4.dp))
             Text(
                 description,
-                style = TextStyle(fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
             )
         }
 
@@ -459,7 +456,7 @@ private fun FaceShapeCard(
             onClick = onLearnMore,
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text("Learn more", style = TextStyle(fontSize = 12.sp, color = RRose, fontWeight = FontWeight.SemiBold))
+            Text("Learn more", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = RRose, fontWeight = FontWeight.SemiBold))
         }
     }
 }
@@ -565,7 +562,7 @@ private fun SkinToneCard(
     val activeIndex = SKIN_TONE_SWATCHES.indexOfFirst { it.first == skinTone.uppercase() }
 
     ResultCard(modifier = modifier) {
-        Text("Skin Tone & Undertone", style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
+        Text("Skin Tone & Undertone", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
 
         Spacer(Modifier.height(12.dp))
 
@@ -593,21 +590,21 @@ private fun SkinToneCard(
 
         Text(
             skinTone.lowercase().replaceFirstChar { it.uppercase() }.ifEmpty { "—" },
-            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RText)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RText)
         )
 
         Text(
             undertone.lowercase().replaceFirstChar { it.uppercase() }.let {
                 if (it.isNotEmpty()) "$it Undertone" else "—"
             },
-            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = RText)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = RText)
         )
 
         if (undertoneDescription.isNotEmpty()) {
             Spacer(Modifier.height(4.dp))
             Text(
                 undertoneDescription,
-                style = TextStyle(fontSize = 11.sp, color = RMuted, lineHeight = 15.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted, lineHeight = 15.sp)
             )
         }
 
@@ -622,7 +619,7 @@ private fun SkinToneCard(
             ) {
                 Text(
                     undertone.lowercase().replaceFirstChar { it.uppercase() },
-                    style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = RText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = RText)
                 )
             }
         }
@@ -654,7 +651,7 @@ private fun EyesFeaturesCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Eyes & Features", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RText))
+            Text("Eyes & Features", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RText))
             IconButton(onClick = onDetailClick, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.AutoMirrored.Outlined.ArrowForwardIos, "Details", tint = RMuted, modifier = Modifier.size(14.dp))
             }
@@ -684,8 +681,8 @@ private fun FeatureChipItem(chip: FeatureChip, modifier: Modifier = Modifier) {
     ) {
         FeatureIcon(label = chip.label)
         Spacer(Modifier.height(6.dp))
-        Text(chip.label, style = TextStyle(fontSize = 9.sp, color = RMuted, textAlign = TextAlign.Center))
-        Text(chip.value, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RText, textAlign = TextAlign.Center))
+        Text(chip.label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = RMuted, textAlign = TextAlign.Center))
+        Text(chip.value, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RText, textAlign = TextAlign.Center))
     }
 }
 
@@ -774,12 +771,12 @@ private fun FeatureLockBannerCard(onUpgrade: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     "Unlock detailed feature analysis",
-                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText)
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
                     "Get in-depth measurements, symmetry score, and personalized improvement tips.",
-                    style = TextStyle(fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted, lineHeight = 16.sp)
                 )
             }
         }
@@ -792,7 +789,7 @@ private fun FeatureLockBannerCard(onUpgrade: () -> Unit) {
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = RDark)
         ) {
-            Text("Upgrade Now", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+            Text("Upgrade Now", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
         }
     }
 }
@@ -808,7 +805,7 @@ private fun CelebrityLookalikesCard(matches: List<CelebrityMatch>) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Celebrity Lookalikes", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RText))
+            Text("Celebrity Lookalikes", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RText))
         }
 
         Spacer(Modifier.height(16.dp))
@@ -838,7 +835,7 @@ private fun CelebritySlot(match: CelebrityMatch) {
             ) {
                 Text(
                     match.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString(""),
-                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RMuted)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RMuted)
                 )
             }
             // Rank badge
@@ -852,13 +849,13 @@ private fun CelebritySlot(match: CelebrityMatch) {
             ) {
                 Text(
                     "${match.rank}",
-                    style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 )
             }
         }
         Spacer(Modifier.height(6.dp))
-        Text(match.name, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RText, textAlign = TextAlign.Center))
-        Text("${match.similarityPct}% match", style = TextStyle(fontSize = 10.sp, color = RMuted))
+        Text(match.name, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RText, textAlign = TextAlign.Center))
+        Text("${match.similarityPct}% match", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = RMuted))
     }
 }
 
@@ -881,7 +878,7 @@ private fun OverallScoreCard(
     }
 
     ResultCard(modifier = modifier) {
-        Text("Overall Score", style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
+        Text("Overall Score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted))
         Spacer(Modifier.height(12.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -905,17 +902,17 @@ private fun OverallScoreCard(
                     )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("$score", style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RText))
-                    Text("/100", style = TextStyle(fontSize = 9.sp, color = RMuted))
+                    Text("$score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RText))
+                    Text("/100", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = RMuted))
                 }
             }
 
             Spacer(Modifier.width(10.dp))
 
             Column {
-                Text(verdictLabel, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RText))
+                Text(verdictLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RText))
                 Spacer(Modifier.height(2.dp))
-                Text(verdictBody, style = TextStyle(fontSize = 10.sp, color = RMuted, lineHeight = 14.sp))
+                Text(verdictBody, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = RMuted, lineHeight = 14.sp))
             }
         }
     }
@@ -952,14 +949,14 @@ private fun GlowUpPotentialCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Glow-Up\nPotential", style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted, lineHeight = 15.sp))
+            Text("Glow-Up\nPotential", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = RMuted, lineHeight = 15.sp))
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .background(RRose)
                     .padding(horizontal = 6.dp, vertical = 3.dp)
             ) {
-                Text(badgeLabel, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                Text(badgeLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
             }
         }
 
@@ -983,7 +980,7 @@ private fun GlowUpPotentialCard(
 
         Spacer(Modifier.height(10.dp))
 
-        Text(description, style = TextStyle(fontSize = 10.sp, color = RMuted, lineHeight = 14.sp))
+        Text(description, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = RMuted, lineHeight = 14.sp))
 
         Spacer(Modifier.height(8.dp))
 
@@ -991,7 +988,7 @@ private fun GlowUpPotentialCard(
             onClick = onViewFullReport,
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text("See Full Report", style = TextStyle(fontSize = 12.sp, color = RRose, fontWeight = FontWeight.SemiBold))
+            Text("See Full Report", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = RRose, fontWeight = FontWeight.SemiBold))
         }
     }
 }
@@ -1018,8 +1015,8 @@ private fun ShareResultCard(onShare: () -> Unit, isGenerating: Boolean) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Share your result", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText))
-                Text("Create and share your stylish result card", style = TextStyle(fontSize = 11.sp, color = RMuted))
+                Text("Share your result", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText))
+                Text("Create and share your stylish result card", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted))
             }
 
             Spacer(Modifier.width(8.dp))
@@ -1036,7 +1033,7 @@ private fun ShareResultCard(onShare: () -> Unit, isGenerating: Boolean) {
                 } else {
                     Icon(Icons.Outlined.Share, null, tint = Color.White, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Share Image", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                    Text("Share Image", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
                 }
             }
         }
@@ -1070,8 +1067,8 @@ private fun RescanBar(onClick: () -> Unit, modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.width(12.dp))
             Column {
-                Text("Re-scan", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
-                Text("Scan again to track your progress", style = TextStyle(fontSize = 11.sp, color = Color.White.copy(alpha = 0.65f)))
+                Text("Re-scan", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                Text("Scan again to track your progress", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = Color.White.copy(alpha = 0.65f)))
             }
         }
     }
@@ -1117,13 +1114,13 @@ private fun FaceShapeLearnMoreSheet(shape: String, onDismiss: () -> Unit) {
                 Spacer(Modifier.width(12.dp))
                 Text(
                     info?.first ?: "${shape.lowercase().replaceFirstChar { it.uppercase() }} Face",
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RText)
                 )
             }
             Spacer(Modifier.height(16.dp))
             Text(
                 info?.second ?: "Balanced, versatile features that complement many styles.",
-                style = TextStyle(fontSize = 14.sp, color = RMuted, lineHeight = 22.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = RMuted, lineHeight = 22.sp)
             )
             Spacer(Modifier.height(24.dp))
             Button(
@@ -1152,11 +1149,11 @@ private fun ComingSoonSheet(onDismiss: () -> Unit) {
         ) {
             Icon(Icons.Outlined.CheckCircle, null, tint = RRose, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(12.dp))
-            Text("Coming soon", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RText))
+            Text("Coming soon", style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RText))
             Spacer(Modifier.height(8.dp))
             Text(
                 "Detailed eye, brow, nose & lip analysis is on its way.",
-                style = TextStyle(fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center, lineHeight = 20.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center, lineHeight = 20.sp)
             )
             Spacer(Modifier.height(24.dp))
             Button(
@@ -1187,11 +1184,11 @@ private fun ResultEmptyState(onStartScan: () -> Unit) {
                 size = Size(size.width * 0.70f, size.height * 0.92f), style = stroke)
         }
         Spacer(Modifier.height(24.dp))
-        Text("No results yet", style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RText))
+        Text("No results yet", style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RText))
         Spacer(Modifier.height(8.dp))
         Text(
             "Complete your first scan to see your personalised analysis.",
-            style = TextStyle(fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center, lineHeight = 20.sp)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center, lineHeight = 20.sp)
         )
         Spacer(Modifier.height(28.dp))
         Button(
@@ -1200,7 +1197,7 @@ private fun ResultEmptyState(onStartScan: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = RRose),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Start your scan", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+            Text("Start your scan", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
         }
     }
 }
@@ -1212,11 +1209,11 @@ private fun ResultErrorState(onRescan: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Something went wrong", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RText))
+        Text("Something went wrong", style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RText))
         Spacer(Modifier.height(8.dp))
         Text(
             "We couldn't load your results. Try scanning again.",
-            style = TextStyle(fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = RMuted, textAlign = TextAlign.Center)
         )
         Spacer(Modifier.height(24.dp))
         Button(
@@ -1225,7 +1222,7 @@ private fun ResultErrorState(onRescan: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = RRose),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Re-scan", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+            Text("Re-scan", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
         }
     }
 }
@@ -1255,8 +1252,8 @@ private fun ColorAnalysisTeaserCard(onClick: () -> Unit) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Color Analysis", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText))
-                Text("Discover your most flattering colours", style = TextStyle(fontSize = 11.sp, color = RMuted))
+                Text("Color Analysis", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = RText))
+                Text("Discover your most flattering colours", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = RMuted))
             }
 
             Icon(

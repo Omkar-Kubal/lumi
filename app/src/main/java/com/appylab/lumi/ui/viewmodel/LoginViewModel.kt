@@ -64,8 +64,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.update { it.copy(isSubmitting = false, passwordError = "Incorrect password") }
                     return@launch
                 }
-                val current = userProfileDao.observe().first() ?: return@launch
-                userProfileDao.upsert(current.copy(hasCompletedOnboarding = true))
+                userProfileDao.updateLastLogin(System.currentTimeMillis())
                 _uiState.update { it.copy(isSubmitting = false) }
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (_: Exception) {

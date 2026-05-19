@@ -21,115 +21,58 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.Air
-import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Brush
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Checkroom
-import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.Opacity
-import androidx.compose.material.icons.outlined.Spa
-import androidx.compose.material.icons.outlined.Texture
-import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.appylab.lumi.ui.theme.LumiTheme
-import com.appylab.lumi.ui.viewmodel.OnboardingViewModel
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val Ob2Background  = Color(0xFFFCFCFC)
 private val Ob2Rose        = Color(0xFFFF637E)
 private val Ob2RoseCard    = Color(0xFFFFF1F2)
 private val Ob2TextPrimary = Color(0xFF0A0A0A)
 private val Ob2TextMuted   = Color(0xFF737373)
-private val Ob2Border      = Color(0xFFE0E0E0)
+private val Ob2CardBorder  = Color(0xFFFFCCD3)
 
-private data class GoalOption(val id: String, val icon: ImageVector)
-private data class ConcernOption(val id: String, val icon: ImageVector)
-
-private val beautyGoalOptions = listOf(
-    GoalOption("Makeup", Icons.Outlined.Brush),
-    GoalOption("Skincare", Icons.Outlined.Spa),
-    GoalOption("Style", Icons.Outlined.Checkroom),
-    GoalOption("Glow-Up", Icons.Outlined.AutoAwesome),
-    GoalOption("All", Icons.Outlined.Apps)
+private data class Ob2FeatureTile(
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val title: String,
+    val subtitle: String
 )
 
-private val skinConcernOptions = listOf(
-    ConcernOption("Acne", Icons.Outlined.Face),
-    ConcernOption("Dryness", Icons.Outlined.WaterDrop),
-    ConcernOption("Oiliness", Icons.Outlined.Opacity),
-    ConcernOption("Dark Spots", Icons.Outlined.Contrast),
-    ConcernOption("Texture", Icons.Outlined.Texture),
-    ConcernOption("Sensitivity", Icons.Outlined.Air)
+private val featureTiles = listOf(
+    Ob2FeatureTile(Icons.Outlined.Face,        "Face & Skin Analysis", "Know your features inside out"),
+    Ob2FeatureTile(Icons.Outlined.AutoAwesome, "AI Glow-Up Score",     "Track your progress over time"),
+    Ob2FeatureTile(Icons.Outlined.Palette,     "Color Season",         "Wear what actually suits you"),
+    Ob2FeatureTile(Icons.Outlined.Visibility,  "Feature Detail",       "Understand every detail of your face")
 )
 
-private val ageRangeOptions = listOf("Under 18", "18–24", "25–34", "35–44", "45+")
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen2(
-    viewModel: OnboardingViewModel? = null,
     onBack: () -> Unit = {},
     onContinue: () -> Unit = {}
 ) {
-    val persistedGoals by (
-        viewModel?.beautyGoals?.collectAsState()
-            ?: remember { mutableStateOf(emptySet<String>()) }
-        )
-    val persistedConcerns by (
-        viewModel?.skinConcerns?.collectAsState()
-            ?: remember { mutableStateOf(emptySet<String>()) }
-        )
-    val persistedAge by (
-        viewModel?.ageRange?.collectAsState()
-            ?: remember { mutableStateOf("") }
-        )
-
-    var selectedGoals by remember(persistedGoals) {
-        mutableStateOf(persistedGoals.ifEmpty { setOf("Glow-Up") })
-    }
-    var selectedConcerns by remember(persistedConcerns) {
-        mutableStateOf(persistedConcerns.ifEmpty { setOf("Dryness") })
-    }
-    var selectedAge by remember(persistedAge) { mutableStateOf(persistedAge) }
-    var ageDropdownExpanded by remember { mutableStateOf(false) }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Ob2Background)
     ) {
-        // Scrollable content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -137,7 +80,7 @@ fun OnboardingScreen2(
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 88.dp)
         ) {
-            // ── Top bar ───────────────────────────────────────────────────
+            // Top bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -155,168 +98,49 @@ fun OnboardingScreen2(
                     )
                 }
                 Text(
-                    text = "Step 2 of 3",
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Ob2TextPrimary
+                    text = "2 of 8",
+                    style = TextStyle(fontFamily = PoppinsFont, 
+                        fontSize = 13.sp,
+                        color = Ob2TextMuted
                     )
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(20.dp))
 
-            // ── Step progress indicator ───────────────────────────────────
-            OnboardingStepIndicator(
-                currentStep = 2,
+            Text(
+                text = "One scan. Everything changes.",
+                style = TextStyle(fontFamily = PoppinsFont, 
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Ob2TextPrimary
+                ),
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(Modifier.height(20.dp))
 
-            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            FeatureGrid(modifier = Modifier.padding(horizontal = 24.dp))
 
-                // ── Beauty Goals ──────────────────────────────────────────
-                Text(
-                    text = "What are your beauty goals?",
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Ob2TextPrimary
-                    )
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = "Select all that apply",
-                    style = TextStyle(fontSize = 12.sp, color = Ob2TextMuted)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(24.dp))
 
-                SelectionChipGrid(
-                    options = beautyGoalOptions.map { it.id to it.icon },
-                    selected = selectedGoals,
-                    onToggle = { id ->
-                        selectedGoals = if (id in selectedGoals)
-                            selectedGoals - id else selectedGoals + id
-                    },
-                    columns = 3
-                )
+            QuoteCard(
+                text = "Beauty isn't one size.\nIt never was.",
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
 
-                Spacer(modifier = Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
 
-                // ── Skin Concerns ─────────────────────────────────────────
-                Text(
-                    text = "Select your skin concerns",
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Ob2TextPrimary
-                    )
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = "Select all that apply",
-                    style = TextStyle(fontSize = 12.sp, color = Ob2TextMuted)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                SelectionChipGrid(
-                    options = skinConcernOptions.map { it.id to it.icon },
-                    selected = selectedConcerns,
-                    onToggle = { id ->
-                        selectedConcerns = if (id in selectedConcerns)
-                            selectedConcerns - id else selectedConcerns + id
-                    },
-                    columns = 3
-                )
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                // ── Age Range ─────────────────────────────────────────────
-                Text(
-                    text = "What's your age range?",
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Ob2TextPrimary
-                    )
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = "This helps us personalize your results",
-                    style = TextStyle(fontSize = 12.sp, color = Ob2TextMuted)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ExposedDropdownMenuBox(
-                    expanded = ageDropdownExpanded,
-                    onExpandedChange = { ageDropdownExpanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = selectedAge.ifEmpty { "Select your age range" },
-                        onValueChange = {},
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Outlined.KeyboardArrowDown,
-                                contentDescription = null,
-                                tint = Ob2TextMuted
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Outlined.CalendarMonth,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                                tint = Ob2TextMuted
-                            )
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 14.sp,
-                            color = if (selectedAge.isEmpty()) Ob2TextMuted else Ob2TextPrimary
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Ob2Rose,
-                            unfocusedBorderColor = Ob2Border,
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
-                        )
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = ageDropdownExpanded,
-                        onDismissRequest = { ageDropdownExpanded = false },
-                        containerColor = Color.White
-                    ) {
-                        ageRangeOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = option,
-                                        style = TextStyle(
-                                            fontSize = 14.sp,
-                                            color = Ob2TextPrimary
-                                        )
-                                    )
-                                },
-                                onClick = {
-                                    selectedAge = option
-                                    ageDropdownExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            OnboardingPageDots(
+                totalPages = 8,
+                currentPage = 2,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
         }
 
-        // ── Fixed bottom Continue button ──────────────────────────────────
+        // Fixed bottom overlay
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -326,14 +150,7 @@ fun OnboardingScreen2(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             Button(
-                onClick = {
-                    viewModel?.savePersonalization(
-                        goals = selectedGoals,
-                        concerns = selectedConcerns,
-                        age = selectedAge
-                    )
-                    onContinue()
-                },
+                onClick = onContinue,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -344,39 +161,31 @@ fun OnboardingScreen2(
                 )
             ) {
                 Text(
-                    text = "Continue",
-                    style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    text = "Sounds good →",
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 )
             }
         }
     }
 }
 
-// ── Reusable multi-select chip grid ──────────────────────────────────────────
-
 @Composable
-private fun SelectionChipGrid(
-    options: List<Pair<String, ImageVector>>,
-    selected: Set<String>,
-    onToggle: (String) -> Unit,
-    columns: Int
-) {
-    val rows = options.chunked(columns)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun FeatureGrid(modifier: Modifier = Modifier) {
+    val rows = featureTiles.chunked(2)
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         rows.forEach { rowItems ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                rowItems.forEach { (id, icon) ->
-                    SelectionChip(
-                        icon = icon,
-                        label = id,
-                        selected = id in selected,
-                        onClick = { onToggle(id) },
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                rowItems.forEach { tile ->
+                    FeatureTileCard(
+                        tile = tile,
                         modifier = Modifier.weight(1f)
                     )
                 }
-                // Fill empty cells in last row
-                repeat(columns - rowItems.size) {
-                    Spacer(modifier = Modifier.weight(1f))
+                repeat(2 - rowItems.size) {
+                    Spacer(Modifier.weight(1f))
                 }
             }
         }
@@ -384,72 +193,86 @@ private fun SelectionChipGrid(
 }
 
 @Composable
-private fun SelectionChip(
-    icon: ImageVector,
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
+private fun FeatureTileCard(
+    tile: Ob2FeatureTile,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = if (selected) Ob2Rose else Ob2Border
-    val bgColor = if (selected) Ob2RoseCard else Color.White
-
     Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(8.dp),
-        color = bgColor,
-        modifier = modifier.border(1.dp, borderColor, RoundedCornerShape(8.dp))
+        shape = RoundedCornerShape(12.dp),
+        color = Color.White,
+        modifier = modifier.border(1.dp, Ob2CardBorder, RoundedCornerShape(12.dp))
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(14.dp),
-                tint = if (selected) Ob2Rose else Ob2TextMuted
-            )
-            Text(
-                text = label,
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    color = if (selected) Ob2Rose else Ob2TextPrimary,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
-                ),
-                modifier = Modifier.weight(1f),
-                maxLines = 1
-            )
-            // Selection indicator circle
+        Column(modifier = Modifier.padding(14.dp)) {
             Box(
                 modifier = Modifier
-                    .size(14.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .background(if (selected) Ob2Rose else Color.Transparent)
-                    .then(
-                        if (!selected) Modifier.border(1.dp, Ob2Border, CircleShape)
-                        else Modifier
-                    ),
+                    .background(Ob2RoseCard),
                 contentAlignment = Alignment.Center
             ) {
-                if (selected) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(8.dp),
-                        tint = Color.White
-                    )
-                }
+                Icon(
+                    imageVector = tile.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = Ob2Rose
+                )
             }
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = tile.title,
+                style = TextStyle(fontFamily = PoppinsFont, 
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Ob2TextPrimary
+                )
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = tile.subtitle,
+                style = TextStyle(fontFamily = PoppinsFont, 
+                    fontSize = 11.sp,
+                    color = Ob2TextMuted,
+                    lineHeight = 16.sp
+                )
+            )
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFFCFCFC)
 @Composable
-private fun OnboardingScreen2Preview() {
-    LumiTheme {
-        OnboardingScreen2()
+private fun QuoteCard(text: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFFFF1F2)
+    ) {
+        Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+            Text(
+                "❝",
+                style = TextStyle(fontFamily = PoppinsFont, 
+                    fontSize = 22.sp,
+                    color = Color(0xFFFF637E),
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 22.sp
+                )
+            )
+            Spacer(Modifier.width(8.dp))
+            Column {
+                Text(
+                    text,
+                    style = TextStyle(fontFamily = PoppinsFont, 
+                        fontSize = 13.sp,
+                        color = Color(0xFF0A0A0A),
+                        lineHeight = 20.sp,
+                        fontStyle = FontStyle.Italic
+                    )
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "— Lumi ✦",
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = Color(0xFFFF637E))
+                )
+            }
+        }
     }
 }

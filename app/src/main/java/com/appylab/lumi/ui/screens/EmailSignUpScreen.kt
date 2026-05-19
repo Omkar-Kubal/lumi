@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appylab.lumi.ui.viewmodel.EmailSignUpViewModel
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val ESBackground = Color(0xFFFCFCFC)
 private val ESCard       = Color.White
@@ -90,7 +91,7 @@ fun EmailSignUpScreen(
                 }
                 Text(
                     "Create Account",
-                    style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = ESText),
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = ESText),
                     modifier = Modifier.align(Alignment.Center)
                 )
                 if (uiState.isSaving) {

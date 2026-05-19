@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appylab.lumi.ui.viewmodel.LoginViewModel
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val LBackground = Color(0xFFFCFCFC)
 private val LText       = Color(0xFF0A0A0A)
@@ -117,12 +118,12 @@ fun LoginScreen(
 
                 Text(
                     "Welcome back",
-                    style = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.SemiBold, color = LText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 26.sp, fontWeight = FontWeight.SemiBold, color = LText)
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
                     "Sign in to continue",
-                    style = TextStyle(fontSize = 14.sp, color = LMuted)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = LMuted)
                 )
 
                 Spacer(Modifier.height(40.dp))
@@ -138,7 +139,7 @@ fun LoginScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             uiState.storedEmail,
-                            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = LText)
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = LText)
                         )
                     }
                 }
@@ -198,7 +199,7 @@ fun LoginScreen(
                     } else {
                         Text(
                             "Sign In",
-                            style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         )
                     }
                 }

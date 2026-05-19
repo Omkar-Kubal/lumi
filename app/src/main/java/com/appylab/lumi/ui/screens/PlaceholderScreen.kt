@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val PHBackground  = Color(0xFFFCFCFC)
 private val PHRose        = Color(0xFFFF637E)
@@ -52,6 +54,7 @@ fun PlaceholderScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
             // Header
             Box(
@@ -72,7 +75,7 @@ fun PlaceholderScreen(
                 }
                 Text(
                     text = title,
-                    style = TextStyle(
+                    style = TextStyle(fontFamily = PoppinsFont, 
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = PHTextPrimary
@@ -113,7 +116,7 @@ fun PlaceholderScreen(
                 ) {
                     Text(
                         text = "Coming soon",
-                        style = TextStyle(
+                        style = TextStyle(fontFamily = PoppinsFont, 
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = PHRose
@@ -126,7 +129,7 @@ fun PlaceholderScreen(
 
                 Text(
                     text = title,
-                    style = TextStyle(
+                    style = TextStyle(fontFamily = PoppinsFont, 
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = PHTextPrimary
@@ -138,7 +141,7 @@ fun PlaceholderScreen(
 
                 Text(
                     text = subtitle,
-                    style = TextStyle(
+                    style = TextStyle(fontFamily = PoppinsFont, 
                         fontSize = 13.sp,
                         color = PHTextMuted,
                         lineHeight = 20.sp

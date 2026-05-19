@@ -33,7 +33,6 @@ data class ProfileUiState(
     val notifUpdates: Boolean = true,
     val showSignOutDialog: Boolean = false,
     val showDeleteDialog: Boolean = false,
-    val showComingSoon: Boolean = false,
     val isEditingPersonalDetails: Boolean = false,
     val ageDraft: String = "",
     val skinTypeDraft: String = "",
@@ -45,8 +44,7 @@ data class ProfileUiState(
 
 private data class ProfileDialogState(
     val signOut: Boolean = false,
-    val delete: Boolean = false,
-    val comingSoon: Boolean = false
+    val delete: Boolean = false
 )
 
 private data class ProfileEditState(
@@ -96,7 +94,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             notifUpdates = state.notifUpdates,
             showSignOutDialog = dialogs.signOut,
             showDeleteDialog = dialogs.delete,
-            showComingSoon = dialogs.comingSoon,
             isEditingPersonalDetails = edit.isEditing,
             ageDraft = edit.ageDraft,
             skinTypeDraft = edit.skinTypeDraft,
@@ -129,12 +126,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun setNotifUpdates(v: Boolean) { viewModelScope.launch { repository.updateNotifUpdates(v) } }
 
     // Dialog state
-    fun requestSignOut()    { _dialogs.update { it.copy(signOut    = true) } }
-    fun dismissSignOut()    { _dialogs.update { it.copy(signOut    = false) } }
-    fun requestDelete()     { _dialogs.update { it.copy(delete     = true) } }
-    fun dismissDelete()     { _dialogs.update { it.copy(delete     = false) } }
-    fun showComingSoon()    { _dialogs.update { it.copy(comingSoon = true) } }
-    fun dismissComingSoon() { _dialogs.update { it.copy(comingSoon = false) } }
+    fun requestSignOut() { _dialogs.update { it.copy(signOut = true) } }
+    fun dismissSignOut() { _dialogs.update { it.copy(signOut = false) } }
+    fun requestDelete()  { _dialogs.update { it.copy(delete  = true) } }
+    fun dismissDelete()  { _dialogs.update { it.copy(delete  = false) } }
 
     // Auth actions
     fun confirmSignOut(onDone: () -> Unit) {

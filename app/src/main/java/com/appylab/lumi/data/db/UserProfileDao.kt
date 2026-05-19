@@ -18,4 +18,7 @@ interface UserProfileDao {
 
     @Query("SELECT passwordHash FROM user_profile WHERE id = 1")
     suspend fun getPasswordHash(): String?
+
+    @Query("UPDATE user_profile SET lastLoginAt = :timestamp WHERE id = 1")
+    suspend fun updateLastLogin(timestamp: Long)
 }

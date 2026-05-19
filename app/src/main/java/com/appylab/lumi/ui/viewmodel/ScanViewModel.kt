@@ -388,6 +388,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                 timestamp = System.currentTimeMillis()
             )
         )
+        android.util.Log.d("ScanViewModel", "scan_complete notification inserted")
         val currentState = appStateDao.getAppState() ?: AppStateEntity()
         appStateDao.upsert(currentState.copy(
             resultsUnviewed = true,

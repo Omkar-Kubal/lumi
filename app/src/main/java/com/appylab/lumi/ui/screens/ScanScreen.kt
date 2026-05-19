@@ -43,6 +43,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -117,6 +118,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import kotlin.math.abs
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 private val SRose    = Color(0xFFFF637E)
@@ -250,7 +252,7 @@ private fun ScanContent(
             ) {
                 Text(
                     captureErrorMsg,
-                    style = TextStyle(fontSize = 15.sp, color = SDark, textAlign = TextAlign.Center)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, color = SDark, textAlign = TextAlign.Center)
                 )
                 Spacer(Modifier.height(20.dp))
                 Button(
@@ -259,7 +261,7 @@ private fun ScanContent(
                     colors = ButtonDefaults.buttonColors(containerColor = SRose),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Try again", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
+                    Text("Try again", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
                 }
                 Spacer(Modifier.navigationBarsPadding())
                 Spacer(Modifier.height(8.dp))
@@ -319,18 +321,20 @@ private fun ScanContent(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Lighting chip — always visible
+                // Lighting chip — always visible; capped width so it never crosses centre
                 LightingChip(
                     status = frameValidation.lightingStatus,
                     modifier = Modifier
                         .align(Alignment.TopStart)
+                        .widthIn(max = 160.dp)
                         .padding(start = 16.dp, top = 8.dp)
                 )
 
-                // Distance chip — hidden when OK (Column gives ColumnScope for AnimatedVisibility)
+                // Distance chip — hidden when OK; capped to prevent overlap with lighting chip
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
+                        .widthIn(max = 160.dp)
                         .padding(end = 16.dp, top = 8.dp)
                 ) {
                     AnimatedVisibility(
@@ -346,10 +350,11 @@ private fun ScanContent(
                     }
                 }
 
-                // Centre chip — hidden when OK
+                // Centre chip — hidden when OK; capped width to stay on right edge
                 Column(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
+                        .widthIn(max = 160.dp)
                         .padding(end = 16.dp)
                 ) {
                     AnimatedVisibility(
@@ -373,37 +378,37 @@ private fun ScanContent(
                     .padding(horizontal = 16.dp)
             ) {
                 // Positioned status bar — only when all checks pass
+                // Single AnimatedVisibility wraps both bar + spacer to avoid layout jump
                 AnimatedVisibility(
                     visible = frameValidation.allPassed,
                     enter = slideInVertically { it / 2 } + fadeIn(tween(200)),
                     exit = fadeOut(tween(150))
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = SWhite
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    Column {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            color = SWhite
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.CheckCircle,
-                                contentDescription = null,
-                                tint = SRose,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "Great! Your face is well positioned",
-                                style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = SDark)
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.CheckCircle,
+                                    contentDescription = null,
+                                    tint = SRose,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "Great! Your face is well positioned",
+                                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = SDark)
+                                )
+                            }
                         }
+                        Spacer(Modifier.height(10.dp))
                     }
-                }
-
-                AnimatedVisibility(visible = frameValidation.allPassed) {
-                    Spacer(Modifier.height(10.dp))
                 }
 
                 // Image quality checklist
@@ -432,9 +437,9 @@ private fun ScanContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(errorMsg, style = TextStyle(fontSize = 11.sp, color = SRose), modifier = Modifier.weight(1f))
+                            Text(errorMsg, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SRose), modifier = Modifier.weight(1f))
                             TextButton(onClick = viewModel::clearError) {
-                                Text("Dismiss", style = TextStyle(fontSize = 11.sp, color = SRose))
+                                Text("Dismiss", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SRose))
                             }
                         }
                     }
@@ -476,7 +481,7 @@ private fun ScanContent(
                 ) {
                     Icon(Icons.Outlined.Lock, contentDescription = null, tint = SWhite40, modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Your images are private and secure", style = TextStyle(fontSize = 11.sp, color = SWhite40))
+                    Text("Your images are private and secure", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SWhite40))
                 }
 
                 Spacer(Modifier.navigationBarsPadding())
@@ -722,11 +727,11 @@ private fun ScanHeader(onBack: () -> Unit, modifier: Modifier = Modifier) {
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "Scan your face",
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = SWhite, textAlign = TextAlign.Center)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = SWhite, textAlign = TextAlign.Center)
             )
             Text(
                 "We'll analyse and personalise for you",
-                style = TextStyle(fontSize = 11.sp, color = SWhite70, textAlign = TextAlign.Center)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SWhite70, textAlign = TextAlign.Center)
             )
         }
         IconButton(onClick = {}) {
@@ -772,8 +777,8 @@ private fun StatusChip(
     ) {
         Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(14.dp))
         Column {
-            Text(title, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
-            Text(subtitle, style = TextStyle(fontSize = 9.sp, color = SWhite70))
+            Text(title, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
+            Text(subtitle, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = SWhite70))
         }
     }
 }
@@ -793,7 +798,7 @@ private fun ImageQualityChecklist(
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 "Image quality",
-                style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SDark.copy(alpha = 0.6f))
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SDark.copy(alpha = 0.6f))
             )
             Spacer(Modifier.height(8.dp))
             ChecklistRow("Face detected", passed = faceDetected)
@@ -810,7 +815,7 @@ private fun ChecklistRow(label: String, passed: Boolean?) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, style = TextStyle(fontSize = 12.sp, color = SDark))
+        Text(label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = SDark))
         when (passed) {
             true -> Icon(Icons.Outlined.CheckCircle, null, tint = SRose, modifier = Modifier.size(16.dp))
             false -> Icon(Icons.Outlined.RadioButtonUnchecked, null, tint = Color(0xFFD1D5DB), modifier = Modifier.size(16.dp))
@@ -861,7 +866,7 @@ private fun CameraControlsRow(
                 Icon(Icons.Outlined.Image, "Gallery", tint = SWhite, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.height(4.dp))
-            Text("Gallery", style = TextStyle(fontSize = 10.sp, color = SWhite70))
+            Text("Gallery", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = SWhite70))
         }
 
         // Capture button
@@ -914,7 +919,7 @@ private fun CameraControlsRow(
                 Icon(Icons.Outlined.Cameraswitch, "Flip camera", tint = SWhite, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.height(4.dp))
-            Text("Flip camera", style = TextStyle(fontSize = 10.sp, color = SWhite70))
+            Text("Flip camera", style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = SWhite70))
         }
     }
 }
@@ -928,7 +933,7 @@ private fun ScanTypeSelector(
     onTypeSelected: (ScanType) -> Unit
 ) {
     Column {
-        Text("Scan type", style = TextStyle(fontSize = 11.sp, color = SWhite70), modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
+        Text("Scan type", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SWhite70), modifier = Modifier.padding(start = 2.dp, bottom = 6.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -998,7 +1003,7 @@ private fun ScanTypeTab(
             Spacer(Modifier.width(4.dp))
             Text(
                 type.displayLabel,
-                style = TextStyle(
+                style = TextStyle(fontFamily = PoppinsFont, 
                     fontSize = 12.sp,
                     fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
                     color = if (selected) SRose else SWhite70
@@ -1044,17 +1049,17 @@ private fun LoadingOverlay(
 
             Text(
                 stage,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = SWhite, textAlign = TextAlign.Center)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = SWhite, textAlign = TextAlign.Center)
             )
 
             Text(
                 "$scanCount of 3 scans used today",
-                style = TextStyle(fontSize = 11.sp, color = SWhite70)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = SWhite70)
             )
 
             AnimatedVisibility(visible = showCancel) {
                 TextButton(onClick = onCancel) {
-                    Text("Cancel", style = TextStyle(fontSize = 13.sp, color = SWhite70))
+                    Text("Cancel", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = SWhite70))
                 }
             }
         }
@@ -1077,13 +1082,13 @@ private fun CameraPermissionDeniedScreen(
             Spacer(Modifier.height(16.dp))
             Text(
                 "Camera access needed",
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = SWhite),
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = SWhite),
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 "Allow camera access so we can analyse your features and personalise recommendations.",
-                style = TextStyle(fontSize = 13.sp, color = SWhite70, lineHeight = 20.sp),
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = SWhite70, lineHeight = 20.sp),
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(28.dp))
@@ -1093,7 +1098,7 @@ private fun CameraPermissionDeniedScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = SRose),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Allow Camera", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
+                Text("Allow Camera", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = SWhite))
             }
             Spacer(Modifier.height(12.dp))
             Button(
@@ -1102,7 +1107,7 @@ private fun CameraPermissionDeniedScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = SWhite.copy(0.10f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Go back", style = TextStyle(fontSize = 14.sp, color = SWhite70))
+                Text("Go back", style = TextStyle(fontFamily = PoppinsFont, fontSize = 14.sp, color = SWhite70))
             }
         }
     }

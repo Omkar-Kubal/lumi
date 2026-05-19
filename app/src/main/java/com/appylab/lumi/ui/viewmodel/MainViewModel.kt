@@ -23,4 +23,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = null
             )
+
+    /**
+     * True when an email-auth user's session has expired (> 15 days since last login).
+     * Skip/guest users always return false — no login gate for them.
+     */
+    val requiresLogin: StateFlow<Boolean?> =
+        repository.observeProfile()
+            .map { profile ->
+                if (profile == null) null
+                else {
+                    val isEmailUser = profile.authType == "email" && profile.passwordHash != null
+                    val ttlExpired  = System.currentTimeMillis() - profile.lastLoginAt > SESSION_TTL_MS
+                    isEmailUser && ttlExpired
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = null
+            )
+
+    companion object {
+        private const val SESSION_TTL_MS = 15L * 24 * 60 * 60 * 1_000 // 15 days
+    }
 }

@@ -75,6 +75,7 @@ class GlowUpImageWorker(
                     timestamp = System.currentTimeMillis()
                 )
             )
+            android.util.Log.d("GlowUpWorker", "glow_up_ready notification inserted")
             val state = appStateDao.getAppState() ?: AppStateEntity()
             appStateDao.upsert(state.copy(unreadNotificationCount = state.unreadNotificationCount + 1))
             Result.success()

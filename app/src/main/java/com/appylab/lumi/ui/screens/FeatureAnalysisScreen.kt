@@ -81,6 +81,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 private val FRose       = Color(0xFFFF637E)
@@ -398,8 +399,8 @@ internal fun FeatureAnalysisScreen(
                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = FText, modifier = Modifier.size(22.dp))
             }
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Feature Detail Analysis", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = FText))
-                Text("In-depth analysis of your facial features", style = TextStyle(fontSize = 11.sp, color = FMuted))
+                Text("Feature Detail Analysis", style = TextStyle(fontFamily = PoppinsFont, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = FText))
+                Text("In-depth analysis of your facial features", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = FMuted))
             }
             IconButton(onClick = { scope.launch { shareFeatureCard(context, features, symmetryScore, faceShape) } }) {
                 Icon(Icons.Outlined.Share, "Share", tint = FText, modifier = Modifier.size(22.dp))
@@ -431,7 +432,7 @@ internal fun FeatureAnalysisScreen(
                     text = {
                         Text(
                             label,
-                            style = TextStyle(
+                            style = TextStyle(fontFamily = PoppinsFont, 
                                 fontSize = 12.sp,
                                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                                 color = if (isSelected) FRose else FMuted
@@ -505,7 +506,7 @@ private fun OverviewTabContent(
                             Text(
                                 "Full-Face Landmark Map",
                                 modifier = Modifier.weight(1f),
-                                style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText)
+                                style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText)
                             )
                             IconButton(onClick = onLandmarkInfo, modifier = Modifier.size(28.dp)) {
                                 Icon(Icons.Outlined.Info, null, tint = FMuted, modifier = Modifier.size(16.dp))
@@ -514,7 +515,7 @@ private fun OverviewTabContent(
                         Spacer(Modifier.height(4.dp))
                         Text(
                             "We detected 68 key facial landmarks to analyse your unique features.",
-                            style = TextStyle(fontSize = 10.sp, color = FMuted, lineHeight = 14.sp)
+                            style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = FMuted, lineHeight = 14.sp)
                         )
                         Spacer(Modifier.height(12.dp))
                         LEGEND_ITEMS.forEach { (dotColor, label) ->
@@ -524,7 +525,7 @@ private fun OverviewTabContent(
                             ) {
                                 Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(dotColor))
                                 Spacer(Modifier.width(6.dp))
-                                Text(label, style = TextStyle(fontSize = 10.sp, color = FMuted))
+                                Text(label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = FMuted))
                             }
                         }
                     }
@@ -542,7 +543,7 @@ private fun OverviewTabContent(
         // 2. Feature deep-dive grid (3×2)
         item {
             FCard {
-                Text("Feature Analysis", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
+                Text("Feature Analysis", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
                 Spacer(Modifier.height(12.dp))
                 features.chunked(2).forEach { row ->
                     Row(
@@ -570,7 +571,7 @@ private fun OverviewTabContent(
         item {
             FCard {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Improvement Priority", modifier = Modifier.weight(1f), style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
+                    Text("Improvement Priority", modifier = Modifier.weight(1f), style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
                     IconButton(onClick = onImprovementInfo, modifier = Modifier.size(28.dp)) {
                         Icon(Icons.Outlined.Info, null, tint = FMuted, modifier = Modifier.size(16.dp))
                     }
@@ -593,9 +594,9 @@ private fun OverviewTabContent(
                 ) {
                     Icon(Icons.Outlined.AutoAwesome, null, tint = FRose, modifier = Modifier.size(18.dp).padding(top = 1.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Expert Tip", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText))
+                        Text("Expert Tip", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText))
                         Spacer(Modifier.height(4.dp))
-                        Text(expertTip, style = TextStyle(fontSize = 11.sp, color = FMuted, lineHeight = 16.sp))
+                        Text(expertTip, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = FMuted, lineHeight = 16.sp))
                     }
                 }
             }
@@ -628,9 +629,9 @@ private fun FeatureTabContent(
                 ) {
                     FeatureIllustration(tab = feature.tab, modifier = Modifier.size(100.dp))
                     Spacer(Modifier.height(12.dp))
-                    Text(feature.typeLabel, style = TextStyle(fontSize = 12.sp, color = FMuted))
+                    Text(feature.typeLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, color = FMuted))
                     Spacer(Modifier.height(4.dp))
-                    Text(feature.label, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = FText))
+                    Text(feature.label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = FText))
                     Spacer(Modifier.height(8.dp))
                     StatusBadge(feature.status)
                 }
@@ -640,18 +641,18 @@ private fun FeatureTabContent(
         // Description
         item {
             FCard {
-                Text("Description", style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FMuted))
+                Text("Description", style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FMuted))
                 Spacer(Modifier.height(8.dp))
-                Text(feature.description, style = TextStyle(fontSize = 13.sp, color = FText, lineHeight = 20.sp))
+                Text(feature.description, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = FText, lineHeight = 20.sp))
             }
         }
 
         // Tips
         item {
             FCard {
-                Text(feature.tipsLabel, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FMuted))
+                Text(feature.tipsLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FMuted))
                 Spacer(Modifier.height(8.dp))
-                Text(feature.tips, style = TextStyle(fontSize = 13.sp, color = FText, lineHeight = 20.sp))
+                Text(feature.tips, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = FText, lineHeight = 20.sp))
             }
         }
 
@@ -668,12 +669,12 @@ private fun FeatureTabContent(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 "Next Feature →",
-                                style = TextStyle(fontSize = 10.sp, color = FMuted)
+                                style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = FMuted)
                             )
                             Spacer(Modifier.height(2.dp))
                             Text(
                                 nextFeature.typeLabel,
-                                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText)
+                                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText)
                             )
                             Spacer(Modifier.height(4.dp))
                             StatusBadge(nextFeature.status)
@@ -703,26 +704,26 @@ private fun FeatureOverviewCard(
     ) {
         FeatureIllustration(tab = feature.tab, modifier = Modifier.size(32.dp))
         Spacer(Modifier.height(6.dp))
-        Text(feature.typeLabel, style = TextStyle(fontSize = 9.sp, color = FMuted))
+        Text(feature.typeLabel, style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = FMuted))
         Spacer(Modifier.height(2.dp))
-        Text(feature.label, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold, color = FText))
+        Text(feature.label, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = FText))
         Spacer(Modifier.height(5.dp))
         StatusBadge(feature.status)
         Spacer(Modifier.height(6.dp))
         Text(
             feature.description,
-            style = TextStyle(fontSize = 9.sp, color = FMuted, lineHeight = 13.sp),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = FMuted, lineHeight = 13.sp),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
         Spacer(Modifier.height(5.dp))
         Text(
             feature.tipsLabel,
-            style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = FMuted)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = FMuted)
         )
         Text(
             feature.tips,
-            style = TextStyle(fontSize = 9.sp, color = FMuted, lineHeight = 13.sp),
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = FMuted, lineHeight = 13.sp),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -751,7 +752,7 @@ private fun SymmetryScoreCard(score: Int) {
     val scaleLabels = listOf("Low", "Average", "High", "Excellent")
 
     FCard {
-        Text("Symmetry Score", style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
+        Text("Symmetry Score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = FText))
         Spacer(Modifier.height(14.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -766,13 +767,13 @@ private fun SymmetryScoreCard(score: Int) {
                     drawArc(FRose, -90f, 360f * animatedProgress, false, style = strokeW)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("$score", style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = FText))
-                    Text("%", style = TextStyle(fontSize = 9.sp, color = FMuted))
+                    Text("$score", style = TextStyle(fontFamily = PoppinsFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = FText))
+                    Text("%", style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, color = FMuted))
                 }
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(verdict, style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = FText))
+                Text(verdict, style = TextStyle(fontFamily = PoppinsFont, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = FText))
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -793,7 +794,7 @@ private fun SymmetryScoreCard(score: Int) {
                             Spacer(Modifier.height(3.dp))
                             Text(
                                 level,
-                                style = TextStyle(
+                                style = TextStyle(fontFamily = PoppinsFont, 
                                     fontSize = 8.sp,
                                     color = if (i == scaleLevel) FRose else FMuted,
                                     fontWeight = if (i == scaleLevel) FontWeight.SemiBold else FontWeight.Normal
@@ -803,7 +804,7 @@ private fun SymmetryScoreCard(score: Int) {
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(description, style = TextStyle(fontSize = 10.sp, color = FMuted, lineHeight = 14.sp))
+                Text(description, style = TextStyle(fontFamily = PoppinsFont, fontSize = 10.sp, color = FMuted, lineHeight = 14.sp))
             }
         }
     }
@@ -836,12 +837,12 @@ private fun ImprovementRow(item: ImprovementItem) {
                 .background(badgeBg),
             contentAlignment = Alignment.Center
         ) {
-            Text("${item.rank}", style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = badgeTextColor))
+            Text("${item.rank}", style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = badgeTextColor))
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(item.area, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText))
+            Text(item.area, style = TextStyle(fontFamily = PoppinsFont, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = FText))
             Spacer(Modifier.height(2.dp))
-            Text(item.action, style = TextStyle(fontSize = 11.sp, color = FMuted, lineHeight = 15.sp))
+            Text(item.action, style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = FMuted, lineHeight = 15.sp))
         }
     }
 }
@@ -858,7 +859,7 @@ private fun StatusBadge(status: String) {
     ) {
         Text(
             status,
-            style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = if (isPositive) FPositive else FNeutral)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, color = if (isPositive) FPositive else FNeutral)
         )
     }
 }
@@ -873,9 +874,9 @@ private fun InfoSheetContent(title: String, body: String) {
             .padding(horizontal = 20.dp)
             .padding(top = 8.dp, bottom = 24.dp)
     ) {
-        Text(title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = FText))
+        Text(title, style = TextStyle(fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = FText))
         Spacer(Modifier.height(10.dp))
-        Text(body, style = TextStyle(fontSize = 13.sp, color = FMuted, lineHeight = 20.sp))
+        Text(body, style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = FMuted, lineHeight = 20.sp))
     }
 }
 

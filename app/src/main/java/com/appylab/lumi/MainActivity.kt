@@ -54,6 +54,11 @@ import com.appylab.lumi.ui.screens.NotificationsScreen
 import com.appylab.lumi.ui.screens.OnboardingScreen1
 import com.appylab.lumi.ui.screens.OnboardingScreen2
 import com.appylab.lumi.ui.screens.OnboardingScreen3
+import com.appylab.lumi.ui.screens.OnboardingScreen4
+import com.appylab.lumi.ui.screens.OnboardingScreen5
+import com.appylab.lumi.ui.screens.OnboardingScreen6
+import com.appylab.lumi.ui.screens.OnboardingScreen7
+import com.appylab.lumi.ui.screens.OnboardingScreen8
 import com.appylab.lumi.ui.screens.PlaceholderScreen
 import com.appylab.lumi.ui.screens.ProfileScreen
 import com.appylab.lumi.ui.screens.ResultScreen
@@ -62,7 +67,11 @@ import com.appylab.lumi.ui.screens.ScanHistoryScreen
 import com.appylab.lumi.ui.screens.ScanScreen
 import com.appylab.lumi.ui.screens.SplashScreen
 import com.appylab.lumi.ui.theme.LumiTheme
+import com.appylab.lumi.ui.screens.EmailSignUpScreen
+import com.appylab.lumi.ui.screens.LoginScreen
+import com.appylab.lumi.ui.viewmodel.EmailSignUpViewModel
 import com.appylab.lumi.ui.viewmodel.HomeViewModel
+import com.appylab.lumi.ui.viewmodel.LoginViewModel
 import com.appylab.lumi.ui.viewmodel.MainViewModel
 import com.appylab.lumi.ui.viewmodel.OnboardingViewModel
 import kotlinx.coroutines.delay
@@ -72,7 +81,9 @@ private val NavMuted   = Color(0xFF737373)
 private val NavSurface = Color.White
 
 private enum class AppScreen {
-    Splash, Onboarding1, Onboarding2, Onboarding3,
+    Splash, Onboarding1, Onboarding2, Onboarding3, Onboarding4,
+    Onboarding5, Onboarding6, Onboarding7, OnboardingEmailSignUp, Onboarding8,
+    Login,
     Main, Scan, Results, Profile, Notifications, Placeholder,
     ColorAnalysis, GlowUp, FeatureAnalysis,
     EditProfile, ScanHistory, SavedPalettes, ChangePassword
@@ -86,9 +97,14 @@ class MainActivity : ComponentActivity() {
             LumiTheme {
                 val mainViewModel: MainViewModel = viewModel()
                 val onboardingViewModel: OnboardingViewModel = viewModel()
+                val emailSignUpViewModel: EmailSignUpViewModel = viewModel()
+                val loginViewModel: LoginViewModel = viewModel()
                 val homeViewModel: HomeViewModel = viewModel()
                 val isOnboardingComplete by mainViewModel.isOnboardingComplete.collectAsState()
+                val requiresLogin by mainViewModel.requiresLogin.collectAsState()
                 val homeUiState by homeViewModel.uiState.collectAsState()
+                val onboardingResumeStep by onboardingViewModel.resumeStep.collectAsState()
+                val onboardingDisplayName by onboardingViewModel.displayName.collectAsState()
 
                 var screen by remember { mutableStateOf(AppScreen.Splash) }
                 var placeholderTitle by remember { mutableStateOf("") }
@@ -97,14 +113,32 @@ class MainActivity : ComponentActivity() {
                 var historyResultId by remember { mutableStateOf<Long?>(null) }
                 var showNoScanDialog by remember { mutableStateOf(false) }
 
-                LaunchedEffect(isOnboardingComplete) {
+                LaunchedEffect(isOnboardingComplete, onboardingResumeStep, requiresLogin) {
                     when (isOnboardingComplete) {
                         null -> Unit
-                        true -> screen = AppScreen.Main
+                        true -> {
+                            val isEntryScreen = screen == AppScreen.Splash
+                                || screen.name.startsWith("Onboarding")
+                                || screen == AppScreen.Login
+                            if (isEntryScreen) {
+                                if (requiresLogin == null) return@LaunchedEffect // profile still loading
+                                screen = if (requiresLogin == true) AppScreen.Login else AppScreen.Main
+                            }
+                        }
                         false -> {
                             screen = AppScreen.Splash
                             delay(3_000L)
-                            screen = AppScreen.Onboarding1
+                            // Resume from the step the user was last on
+                            screen = when (onboardingResumeStep) {
+                                2    -> AppScreen.Onboarding2
+                                3    -> AppScreen.Onboarding3
+                                4    -> AppScreen.Onboarding4
+                                5    -> AppScreen.Onboarding5
+                                6    -> AppScreen.Onboarding6
+                                7    -> AppScreen.Onboarding7
+                                8    -> AppScreen.Onboarding8
+                                else -> AppScreen.Onboarding1
+                            }
                         }
                     }
                 }
@@ -117,7 +151,11 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = isOnboardingComplete == true && screen !in setOf(
                     AppScreen.Splash, AppScreen.Onboarding1, AppScreen.Onboarding2,
-                    AppScreen.Onboarding3, AppScreen.Scan,
+                    AppScreen.Onboarding3, AppScreen.Onboarding4, AppScreen.Onboarding5,
+                    AppScreen.Onboarding6, AppScreen.Onboarding7, AppScreen.OnboardingEmailSignUp,
+                    AppScreen.Onboarding8,
+                    AppScreen.Login,
+                    AppScreen.Scan,
                     AppScreen.ColorAnalysis, AppScreen.GlowUp, AppScreen.FeatureAnalysis,
                     AppScreen.EditProfile, AppScreen.ScanHistory, AppScreen.SavedPalettes,
                     AppScreen.ChangePassword
@@ -147,19 +185,97 @@ class MainActivity : ComponentActivity() {
                         screen == AppScreen.Splash -> SplashScreen()
 
                         screen == AppScreen.Onboarding1 -> OnboardingScreen1(
-                            onGetStarted = { screen = AppScreen.Onboarding2 }
+                            onGetStarted = {
+                                onboardingViewModel.advanceStep(2)
+                                screen = AppScreen.Onboarding2
+                            },
+                            onSkip = {
+                                onboardingViewModel.skipOnboarding()
+                                screen = AppScreen.Main
+                            }
                         )
 
                         screen == AppScreen.Onboarding2 -> OnboardingScreen2(
-                            viewModel = onboardingViewModel,
                             onBack = { screen = AppScreen.Onboarding1 },
-                            onContinue = { screen = AppScreen.Onboarding3 }
+                            onContinue = {
+                                onboardingViewModel.advanceStep(3)
+                                screen = AppScreen.Onboarding3
+                            }
                         )
 
                         screen == AppScreen.Onboarding3 -> OnboardingScreen3(
-                            viewModel = onboardingViewModel,
                             onBack = { screen = AppScreen.Onboarding2 },
-                            onContinue = { screen = AppScreen.Main }
+                            onContinue = {
+                                onboardingViewModel.advanceStep(4)
+                                screen = AppScreen.Onboarding4
+                            }
+                        )
+
+                        screen == AppScreen.Onboarding4 -> OnboardingScreen4(
+                            onBack = { screen = AppScreen.Onboarding3 },
+                            onContinue = {
+                                onboardingViewModel.advanceStep(5)
+                                screen = AppScreen.Onboarding5
+                            }
+                        )
+
+                        screen == AppScreen.Onboarding5 -> OnboardingScreen5(
+                            viewModel = onboardingViewModel,
+                            onBack    = { screen = AppScreen.Onboarding4 },
+                            onContinue = {
+                                onboardingViewModel.advanceStep(6)
+                                screen = AppScreen.Onboarding6
+                            }
+                        )
+
+                        screen == AppScreen.Onboarding6 -> OnboardingScreen6(
+                            viewModel = onboardingViewModel,
+                            onBack    = { screen = AppScreen.Onboarding5 },
+                            onContinue = {
+                                onboardingViewModel.advanceStep(7)
+                                screen = AppScreen.Onboarding7
+                            }
+                        )
+
+                        screen == AppScreen.Onboarding7 -> OnboardingScreen7(
+                            viewModel = onboardingViewModel,
+                            onBack    = { screen = AppScreen.Onboarding6 },
+                            onContinue = {
+                                // Route based on selected auth type
+                                when (onboardingViewModel.authType.value) {
+                                    "email" -> {
+                                        onboardingViewModel.advanceStep(8)
+                                        screen = AppScreen.OnboardingEmailSignUp
+                                    }
+                                    else -> {
+                                        onboardingViewModel.advanceStep(8)
+                                        screen = AppScreen.Onboarding8
+                                    }
+                                }
+                            }
+                        )
+
+                        screen == AppScreen.OnboardingEmailSignUp -> EmailSignUpScreen(
+                            viewModel = emailSignUpViewModel,
+                            onBack    = { screen = AppScreen.Onboarding7 },
+                            onSuccess = { screen = AppScreen.Onboarding8 }
+                        )
+
+                        screen == AppScreen.Onboarding8 -> OnboardingScreen8(
+                            displayName = onboardingDisplayName,
+                            onStartScan = {
+                                onboardingViewModel.finalizeOnboarding()
+                                screen = AppScreen.Scan
+                            },
+                            onExplore = {
+                                onboardingViewModel.finalizeOnboarding()
+                                screen = AppScreen.Main
+                            }
+                        )
+
+                        screen == AppScreen.Login -> LoginScreen(
+                            viewModel = loginViewModel,
+                            onSuccess = { screen = AppScreen.Main }
                         )
 
                         screen == AppScreen.Main -> HomeScreen(

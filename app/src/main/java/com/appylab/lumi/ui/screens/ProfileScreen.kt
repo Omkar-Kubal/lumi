@@ -39,7 +39,6 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.LocalOffer
@@ -222,31 +221,18 @@ fun ProfileScreen(
                     )
                 }
 
-                // ── 3: Saved content (two side-by-side cards) ─────────────
+                // ── 3: Saved Palettes ─────────────────────────────────────
                 item {
-                    Row(
+                    SavedContentCard(
+                        title = "Saved Palettes",
+                        lockBody = "Save your seasonal color palettes with Pro.",
+                        isPro = isPro,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        SavedContentCard(
-                            title = "Saved Routines",
-                            lockBody = "Save and access your makeup routines with Pro.",
-                            isPro = isPro,
-                            modifier = Modifier.weight(1f),
-                            onViewAll = { viewModel.showComingSoon() },
-                            onUpgrade = onUpgrade
-                        )
-                        SavedContentCard(
-                            title = "Saved Palettes",
-                            lockBody = "Save your seasonal color palettes with Pro.",
-                            isPro = isPro,
-                            modifier = Modifier.weight(1f),
-                            onViewAll = onViewSavedPalettes,
-                            onUpgrade = onUpgrade
-                        )
-                    }
+                        onViewAll = onViewSavedPalettes,
+                        onUpgrade = onUpgrade
+                    )
                 }
 
                 // ── 4: Personal details ───────────────────────────────────
@@ -418,35 +404,6 @@ fun ProfileScreen(
             }
         }
 
-        // ── Coming soon sheet ─────────────────────────────────────────────────
-        if (uiState.showComingSoon) {
-            val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-            ModalBottomSheet(
-                onDismissRequest = viewModel::dismissComingSoon,
-                sheetState = sheetState,
-                containerColor = PCard
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = PRose, modifier = Modifier.size(40.dp))
-                    Spacer(Modifier.height(12.dp))
-                    Text("Coming Soon", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = PText)
-                    Spacer(Modifier.height(6.dp))
-                    Text("This feature is on its way — stay tuned!", color = PMuted, fontSize = 14.sp)
-                    Spacer(Modifier.height(24.dp))
-                    Button(
-                        onClick = viewModel::dismissComingSoon,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = PDark)
-                    ) { Text("Got it", color = Color.White) }
-                    Spacer(Modifier.navigationBarsPadding())
-                }
-            }
-        }
     }
 }
 

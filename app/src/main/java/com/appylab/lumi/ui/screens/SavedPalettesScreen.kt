@@ -184,7 +184,8 @@ internal fun SavedPalettesScreen(
                         }
                     }
 
-                    item { Spacer(Modifier.navigationBarsPadding().height(16.dp)) }
+                    // Extra height absorbs Snackbar (≈48 dp) so last item is never hidden
+                    item { Spacer(Modifier.navigationBarsPadding().height(80.dp)) }
                 }
             }
         }

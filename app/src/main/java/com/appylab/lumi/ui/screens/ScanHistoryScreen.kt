@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -237,7 +238,8 @@ internal fun ScanHistoryScreen(
                         }
                     }
 
-                    item { Spacer(Modifier.navigationBarsPadding().height(16.dp)) }
+                    // Extra height absorbs Snackbar (≈48 dp) so last item is never hidden
+                    item { Spacer(Modifier.navigationBarsPadding().height(80.dp)) }
                 }
             }
         }
@@ -413,27 +415,30 @@ private fun ProgressChartCard(
             }
         }
 
-        // X-axis labels
+        // X-axis labels — weight(1f) + ellipsis prevents overflow on narrow screens
         if (data.size >= 2) {
             val labelIndices = if (data.size <= 6) data.indices.toList()
             else listOf(0, data.size / 4, data.size / 2, 3 * data.size / 4, data.size - 1).distinct()
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 labelIndices.forEach { i ->
                     Text(
                         dateFmt.format(Date(data[i].timestamp)),
                         fontSize = 10.sp,
-                        color = SHMuted
+                        color = SHMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 if (projectedScore != null && projectedDate != null) {
                     Text(
                         dateFmt.format(Date(projectedDate)),
                         fontSize = 10.sp,
-                        color = SHMuted.copy(alpha = 0.55f)
+                        color = SHMuted.copy(alpha = 0.55f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -512,8 +517,8 @@ private fun ScanRowCard(scan: FaceAnalysisEntity, onClick: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Face + Skin", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = SHText)
-                    Text(dateStr, fontSize = 12.sp, color = SHMuted)
+                    Text("Face + Skin", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = SHText, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(dateStr, fontSize = 12.sp, color = SHMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 if (score > 0) {
                     Spacer(Modifier.height(4.dp))

@@ -45,6 +45,7 @@ import com.appylab.lumi.ui.viewmodel.NotificationsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.appylab.lumi.ui.theme.PoppinsFont
 
 private val NBackground = Color(0xFFFCFCFC)
 private val NText       = Color(0xFF0A0A0A)
@@ -87,7 +88,7 @@ fun NotificationsScreen(
             }
             Text(
                 "Notifications",
-                style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = NText),
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = NText),
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -118,12 +119,12 @@ fun NotificationsScreen(
                 Spacer(Modifier.height(20.dp))
                 Text(
                     "You're all caught up",
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NText)
+                    style = TextStyle(fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NText)
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Scan reminders and personalised updates will appear here.",
-                    style = TextStyle(
+                    style = TextStyle(fontFamily = PoppinsFont, 
                         fontSize = 14.sp,
                         color = NMuted,
                         lineHeight = 20.sp,
@@ -174,7 +175,7 @@ private fun NotificationItem(notif: NotificationEntity) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 notif.title,
-                style = TextStyle(
+                style = TextStyle(fontFamily = PoppinsFont, 
                     fontSize = 14.sp,
                     fontWeight = if (notif.isRead) FontWeight.Normal else FontWeight.SemiBold,
                     color = NText
@@ -183,13 +184,13 @@ private fun NotificationItem(notif: NotificationEntity) {
             Spacer(Modifier.height(2.dp))
             Text(
                 notif.body,
-                style = TextStyle(fontSize = 13.sp, color = NMuted, lineHeight = 18.sp)
+                style = TextStyle(fontFamily = PoppinsFont, fontSize = 13.sp, color = NMuted, lineHeight = 18.sp)
             )
         }
         Spacer(Modifier.width(10.dp))
         Text(
             formatTimestamp(notif.timestamp),
-            style = TextStyle(fontSize = 11.sp, color = NMuted)
+            style = TextStyle(fontFamily = PoppinsFont, fontSize = 11.sp, color = NMuted)
         )
     }
 }
