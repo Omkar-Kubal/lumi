@@ -100,20 +100,31 @@ class GeminiService {
 
     private fun parseAnalysisResponse(json: String): GeminiFaceResult? = runCatching {
         val o = JSONObject(json)
+        val makeupObj       = o.optJSONObject("makeup_palette")
+        val featureDetailObj = o.optJSONObject("feature_detail")
         GeminiFaceResult(
-            glowUpScore          = o.optInt("glow_up_score", 75).coerceIn(0, 100),
-            faceShape            = o.optString("face_shape", "OVAL").uppercase(),
-            faceShapeDescription = o.optString("face_shape_description", ""),
-            skinTone             = o.optString("skin_tone", "MEDIUM").uppercase(),
-            undertone            = o.optString("undertone", "NEUTRAL").uppercase(),
-            undertoneDescription = o.optString("undertone_description", ""),
-            eyeShape             = o.optString("eye_shape", "ALMOND").uppercase(),
-            browType             = o.optString("brow_type", "DEFINED").uppercase(),
-            noseShape            = o.optString("nose_shape", "STRAIGHT").uppercase(),
-            lipType              = o.optString("lip_type", "FULL").uppercase(),
-            improvementAreasJson = o.optJSONArray("improvement_areas")?.toString() ?: "[]",
-            stepGuidesJson       = o.optJSONArray("step_guides")?.toString() ?: "[]",
-            celebrityMatchesJson = o.optJSONArray("celebrity_matches")?.toString() ?: "[]"
+            glowUpScore             = o.optInt("glow_up_score", 75).coerceIn(0, 100),
+            faceShape               = o.optString("face_shape", "OVAL").uppercase(),
+            faceShapeDescription    = o.optString("face_shape_description", ""),
+            skinTone                = o.optString("skin_tone", "MEDIUM").uppercase(),
+            undertone               = o.optString("undertone", "NEUTRAL").uppercase(),
+            undertoneDescription    = o.optString("undertone_description", ""),
+            eyeShape                = o.optString("eye_shape", "ALMOND").uppercase(),
+            browType                = o.optString("brow_type", "DEFINED").uppercase(),
+            noseShape               = o.optString("nose_shape", "STRAIGHT").uppercase(),
+            lipType                 = o.optString("lip_type", "FULL").uppercase(),
+            improvementAreasJson    = o.optJSONArray("improvement_areas")?.toString() ?: "[]",
+            stepGuidesJson          = o.optJSONArray("step_guides")?.toString() ?: "[]",
+            celebrityMatchesJson    = o.optJSONArray("celebrity_matches")?.toString() ?: "[]",
+            colorSeason             = o.optString("color_season", "").uppercase(),
+            personalPaletteJson     = o.optJSONArray("personal_palette")?.toString() ?: "[]",
+            avoidColorsJson         = o.optJSONArray("avoid_colors")?.toString() ?: "[]",
+            clothingRecsJson        = o.optJSONArray("clothing_recs")?.toString() ?: "[]",
+            hairColorRecsJson       = o.optJSONArray("hair_color_recs")?.toString() ?: "[]",
+            lipColorsJson           = makeupObj?.optJSONArray("lip_colors")?.toString() ?: "[]",
+            eyeColorsJson           = makeupObj?.optJSONArray("eye_colors")?.toString() ?: "[]",
+            symmetryScore           = featureDetailObj?.optInt("symmetry_score", -1)?.let { if (it > 0) it.coerceIn(50, 100) else -1 } ?: -1,
+            improvementPriorityJson = featureDetailObj?.optJSONArray("improvement_priority")?.toString() ?: "[]"
         )
     }.getOrNull()
 
@@ -162,12 +173,41 @@ Required fields:
     { "rank": 1, "name": "<name>", "similarityPct": <int 50-85> },
     { "rank": 2, "name": "<name>", "similarityPct": <int 45-75> },
     { "rank": 3, "name": "<name>", "similarityPct": <int 40-70> }
-  ]
+  ],
+  "color_season": <"SPRING"|"SUMMER"|"AUTUMN"|"WINTER">,
+  "personal_palette": [
+    { "name": "<color name>", "hex": "#XXXXXX" }
+  ],
+  "avoid_colors": [
+    { "name": "<color name>", "hex": "#XXXXXX", "reason": "<1 sentence why to avoid>" }
+  ],
+  "clothing_recs": [
+    { "name": "<color name>", "hex": "#XXXXXX" }
+  ],
+  "hair_color_recs": [
+    { "name": "<color name>", "hex": "#XXXXXX" }
+  ],
+  "makeup_palette": {
+    "lip_colors": [ { "name": "<color name>", "hex": "#XXXXXX" } ],
+    "eye_colors": [ { "name": "<color name>", "hex": "#XXXXXX" } ]
+  },
+  "feature_detail": {
+    "symmetry_score": <integer 50-100>,
+    "improvement_priority": [
+      { "rank": 1, "area": "<area name>", "action": "<specific improvement action>" }
+    ]
+  }
 }
 
 Rules:
 - improvement_areas: max 5 items, ordered HIGH → LOW impact
 - Every area in improvement_areas must have a matching step_guides entry
+- personal_palette: exactly 8 items tailored to the detected color season
+- avoid_colors: exactly 4 items with reasons specific to the person's coloring
+- clothing_recs: 8 items, hair_color_recs: 5 items
+- makeup_palette.lip_colors: 4 items, makeup_palette.eye_colors: 4 items
+- improvement_priority: max 5 items ordered most impactful first
+- All hex values must be valid 6-digit hex codes starting with #
 - Be specific and personalised to the actual face visible in the image
 - Return ONLY the JSON object"""
 
@@ -190,5 +230,16 @@ data class GeminiFaceResult(
     val lipType: String,
     val improvementAreasJson: String,
     val stepGuidesJson: String,
-    val celebrityMatchesJson: String
+    val celebrityMatchesJson: String,
+    // Color analysis
+    val colorSeason: String = "",
+    val personalPaletteJson: String = "[]",
+    val avoidColorsJson: String = "[]",
+    val clothingRecsJson: String = "[]",
+    val hairColorRecsJson: String = "[]",
+    val lipColorsJson: String = "[]",
+    val eyeColorsJson: String = "[]",
+    // Feature detail
+    val symmetryScore: Int = -1,
+    val improvementPriorityJson: String = "[]"
 )

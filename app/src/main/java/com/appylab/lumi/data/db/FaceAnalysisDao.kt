@@ -2,6 +2,7 @@ package com.appylab.lumi.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +23,12 @@ interface FaceAnalysisDao {
     /** All scans for the user ordered oldest → newest for progress chart */
     @Query("SELECT * FROM face_analysis WHERE userId = :userId ORDER BY timestamp ASC")
     suspend fun getScoreHistory(userId: Int = 1): List<FaceAnalysisEntity>
+
+    @Query("DELETE FROM face_analysis WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun restore(entity: FaceAnalysisEntity)
 
     @Query("DELETE FROM face_analysis")
     suspend fun deleteAll()

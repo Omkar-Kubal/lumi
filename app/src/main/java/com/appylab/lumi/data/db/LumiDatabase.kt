@@ -13,9 +13,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         FaceAnalysisEntity::class,
         SavedTipEntity::class,
         AppStateEntity::class,
-        GlowUpEntity::class
+        GlowUpEntity::class,
+        ColorAnalysisEntity::class,
+        FeatureDetailEntity::class,
+        NotificationEntity::class
     ],
-    version = 8,
+    version = 11,
     exportSchema = false
 )
 abstract class LumiDatabase : RoomDatabase() {
@@ -24,6 +27,9 @@ abstract class LumiDatabase : RoomDatabase() {
     abstract fun savedTipDao(): SavedTipDao
     abstract fun appStateDao(): AppStateDao
     abstract fun glowUpDao(): GlowUpDao
+    abstract fun colorAnalysisDao(): ColorAnalysisDao
+    abstract fun featureDetailDao(): FeatureDetailDao
+    abstract fun notificationDao(): NotificationDao
 
     companion object {
         @Volatile
@@ -122,6 +128,55 @@ abstract class LumiDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS color_analysis (
+                        faceAnalysisId INTEGER PRIMARY KEY NOT NULL,
+                        colorSeason TEXT NOT NULL DEFAULT '',
+                        personalPaletteJson TEXT NOT NULL DEFAULT '[]',
+                        avoidColorsJson TEXT NOT NULL DEFAULT '[]',
+                        clothingRecsJson TEXT NOT NULL DEFAULT '[]',
+                        hairColorRecsJson TEXT NOT NULL DEFAULT '[]',
+                        lipColorsJson TEXT NOT NULL DEFAULT '[]',
+                        eyeColorsJson TEXT NOT NULL DEFAULT '[]',
+                        isSaved INTEGER NOT NULL DEFAULT 0,
+                        createdAt INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS feature_detail (
+                        faceAnalysisId INTEGER PRIMARY KEY NOT NULL,
+                        symmetryScore INTEGER NOT NULL DEFAULT 75,
+                        improvementPriorityJson TEXT NOT NULL DEFAULT '[]',
+                        createdAt INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN passwordHash TEXT")
+                db.execSQL("ALTER TABLE color_analysis ADD COLUMN savedAt INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        private val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS notification (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        type TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        body TEXT NOT NULL,
+                        timestamp INTEGER NOT NULL,
+                        isRead INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
         fun getInstance(context: Context): LumiDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -132,7 +187,8 @@ abstract class LumiDatabase : RoomDatabase() {
                     .addMigrations(
                         MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
                         MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-                        MIGRATION_7_8
+                        MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
+                        MIGRATION_10_11
                     )
                     .build()
                     .also { instance = it }

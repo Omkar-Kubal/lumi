@@ -22,5 +22,7 @@ data class UserProfileEntity(
     val age: Int = 0,
     val skinTypePref: String = "",
     val skinTonePref: String = "",
-    val undertonePref: String = ""
+    val undertonePref: String = "",
+    // Added v10 — local password auth
+    val passwordHash: String? = null
 )

@@ -116,13 +116,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             greetingSubtitle = greetingSubtitle,
             unreadNotificationCount = primary.unreadCount,
             lastScan = primary.lastScan,
-            subscriptionTier = primary.tier,
+            subscriptionTier = SubscriptionTier.PRO,
             dailyTip = tipsWindow.getOrNull(secondary.tipIndex),
             currentTipWindowIndex = secondary.tipIndex,
             tipsWindow = tipsWindow,
             savedTipIds = secondary.savedIds,
             trendingLooks = secondary.looks,
-            showUpsellBanner = primary.tier == SubscriptionTier.FREE && !secondary.bannerDismissed,
+            showUpsellBanner = false,
             resultsUnviewed = primary.resultsUnviewed
         )
     }.stateIn(

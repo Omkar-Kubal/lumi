@@ -100,11 +100,13 @@ private sealed class ResultSubScreen {
 
 @Composable
 fun ResultScreen(
+    faceAnalysisId: Long? = null,
     viewModel: ResultViewModel = viewModel(),
     onBack: () -> Unit = {},
-    onRescan: () -> Unit = {},
-    onPaywall: (context: String) -> Unit = {}
+    onRescan: () -> Unit = {}
 ) {
+    LaunchedEffect(faceAnalysisId) { viewModel.setSpecificId(faceAnalysisId) }
+
     val uiState by viewModel.uiState.collectAsState()
     val appContext = LocalContext.current
     var subScreen by remember { mutableStateOf<ResultSubScreen?>(null) }
@@ -119,16 +121,14 @@ fun ResultScreen(
             when (sub) {
                 ResultSubScreen.GlowUp -> GlowUpResultScreen(
                     faceAnalysisId = uiState.analysis?.id ?: 0L,
-                    onBack     = { subScreen = null },
-                    onPaywall  = { onPaywall("glow_up") }
+                    onBack = { subScreen = null }
                 )
                 ResultSubScreen.ColorAnalysis -> ColorAnalysisScreen(
-                    skinTone = uiState.analysis?.skinTone.orEmpty(),
-                    undertone = uiState.analysis?.undertone.orEmpty(),
+                    faceAnalysisId = uiState.analysis?.id ?: 0L,
                     onBack = { subScreen = null }
                 )
                 ResultSubScreen.FeatureAnalysis -> FeatureAnalysisScreen(
-                    analysis = uiState.analysis,
+                    faceAnalysisId = uiState.analysis?.id ?: 0L,
                     onBack = { subScreen = null }
                 )
             }
@@ -151,14 +151,12 @@ fun ResultScreen(
                 uiState.analysis != null -> {
                     ResultContent(
                         analysis = uiState.analysis!!,
-                        subscriptionTier = uiState.subscriptionTier,
                         glowUpPotential = uiState.glowUpPotential,
                         verdictLabel = uiState.verdictLabel,
                         verdictBody = uiState.verdictBody,
                         isGeneratingShare = uiState.isGeneratingShareCard,
                         onBack = onBack,
                         onRescan = onRescan,
-                        onPaywall = onPaywall,
                         onShare = { viewModel.shareResult(appContext) },
                         onViewGlowUp = { subScreen = ResultSubScreen.GlowUp },
                         onViewColorAnalysis = { subScreen = ResultSubScreen.ColorAnalysis },
@@ -177,20 +175,17 @@ fun ResultScreen(
 @Composable
 private fun ResultContent(
     analysis: FaceAnalysis,
-    subscriptionTier: SubscriptionTier,
     glowUpPotential: GlowUpPotential,
     verdictLabel: String,
     verdictBody: String,
     isGeneratingShare: Boolean,
     onBack: () -> Unit,
     onRescan: () -> Unit,
-    onPaywall: (String) -> Unit,
     onShare: () -> Unit,
     onViewGlowUp: () -> Unit,
     onViewColorAnalysis: () -> Unit,
     onViewFeatureAnalysis: () -> Unit
 ) {
-    val isFree = subscriptionTier == SubscriptionTier.FREE
     val formattedDate = remember(analysis.timestamp) {
         SimpleDateFormat("MMM dd, yyyy • hh:mm a", Locale.getDefault())
             .format(Date(analysis.timestamp))
@@ -231,12 +226,7 @@ private fun ResultContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                // 1. Upsell banner (FREE only)
-                if (isFree) {
-                    item { UpsellBannerCard(onUpgrade = { onPaywall("results_banner") }) }
-                }
-
-                // 2. Face Shape + Skin Tone row
+                // 1. Face Shape + Skin Tone row
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -271,18 +261,10 @@ private fun ResultContent(
                     )
                 }
 
-                // 5. Feature lock banner (FREE only)
-                if (isFree) {
-                    item { FeatureLockBannerCard(onUpgrade = { onPaywall("feature_analysis") }) }
-                }
-
-                // 6. Celebrity Lookalikes (only if data present)
+                // 5. Celebrity Lookalikes (only if data present)
                 if (analysis.celebrityMatches.isNotEmpty()) {
                     item {
-                        CelebrityLookalikesCard(
-                            matches = analysis.celebrityMatches,
-                            onPremiumClick = { onPaywall("celebrity") }
-                        )
+                        CelebrityLookalikesCard(matches = analysis.celebrityMatches)
                     }
                 }
 
@@ -818,10 +800,7 @@ private fun FeatureLockBannerCard(onUpgrade: () -> Unit) {
 // ── 5. Celebrity Lookalikes ───────────────────────────────────────────────────
 
 @Composable
-private fun CelebrityLookalikesCard(
-    matches: List<CelebrityMatch>,
-    onPremiumClick: () -> Unit
-) {
+private fun CelebrityLookalikesCard(matches: List<CelebrityMatch>) {
     ResultCard {
         // Header
         Row(
@@ -830,21 +809,6 @@ private fun CelebrityLookalikesCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Celebrity Lookalikes", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RText))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(RDark)
-                    .clickable { onPremiumClick() }
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Icon(Icons.Outlined.Lock, null, tint = Color.White, modifier = Modifier.size(10.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("Premium", style = TextStyle(fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold))
-                Spacer(Modifier.width(4.dp))
-                Icon(Icons.AutoMirrored.Outlined.ArrowForwardIos, null, tint = Color.White, modifier = Modifier.size(10.dp))
-            }
         }
 
         Spacer(Modifier.height(16.dp))

@@ -16,9 +16,12 @@ import androidx.work.WorkManager
 import com.appylab.lumi.data.api.GeminiService
 import com.appylab.lumi.data.api.GeminiFaceResult
 import com.appylab.lumi.data.db.AppStateEntity
+import com.appylab.lumi.data.db.ColorAnalysisEntity
 import com.appylab.lumi.data.db.FaceAnalysisEntity
+import com.appylab.lumi.data.db.FeatureDetailEntity
 import com.appylab.lumi.data.db.GlowUpEntity
 import com.appylab.lumi.data.db.LumiDatabase
+import com.appylab.lumi.data.db.NotificationEntity
 import com.appylab.lumi.data.model.FrameValidationState
 import com.appylab.lumi.data.model.GlowUpImageStatus
 import com.appylab.lumi.data.model.ScanError
@@ -75,11 +78,13 @@ private const val MAX_DIMENSION    = 512
 
 class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val db            = LumiDatabase.getInstance(app)
-    private val appStateDao   = db.appStateDao()
-    private val faceAnalysisDao = db.faceAnalysisDao()
-    private val glowUpDao     = db.glowUpDao()
-    private val gemini        = GeminiService()
+    private val db               = LumiDatabase.getInstance(app)
+    private val appStateDao      = db.appStateDao()
+    private val faceAnalysisDao  = db.faceAnalysisDao()
+    private val glowUpDao        = db.glowUpDao()
+    private val colorAnalysisDao = db.colorAnalysisDao()
+    private val featureDetailDao = db.featureDetailDao()
+    private val gemini           = GeminiService()
 
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
@@ -331,6 +336,33 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
             )
         )
 
+        // 4b. Persist ColorAnalysisEntity
+        colorAnalysisDao.upsert(
+            ColorAnalysisEntity(
+                faceAnalysisId      = faceAnalysisId,
+                colorSeason         = result.colorSeason,
+                personalPaletteJson = result.personalPaletteJson,
+                avoidColorsJson     = result.avoidColorsJson,
+                clothingRecsJson    = result.clothingRecsJson,
+                hairColorRecsJson   = result.hairColorRecsJson,
+                lipColorsJson       = result.lipColorsJson,
+                eyeColorsJson       = result.eyeColorsJson,
+                createdAt           = System.currentTimeMillis()
+            )
+        )
+        android.util.Log.d("ScanViewModel", "ColorAnalysisEntity saved: faceAnalysisId=$faceAnalysisId, season=${result.colorSeason}")
+
+        // 4c. Persist FeatureDetailEntity
+        featureDetailDao.upsert(
+            FeatureDetailEntity(
+                faceAnalysisId          = faceAnalysisId,
+                symmetryScore           = result.symmetryScore,
+                improvementPriorityJson = result.improvementPriorityJson,
+                createdAt               = System.currentTimeMillis()
+            )
+        )
+        android.util.Log.d("ScanViewModel", "FeatureDetailEntity saved: faceAnalysisId=$faceAnalysisId, symmetryScore=${result.symmetryScore}")
+
         // 5. Enqueue WorkManager job for glow-up image generation
         WorkManager.getInstance(getApplication()).enqueue(
             OneTimeWorkRequestBuilder<GlowUpImageWorker>()
@@ -347,9 +379,20 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                 .build()
         )
 
-        // 6. Mark results as unviewed
+        // 6. Fire scan-complete notification + mark results as unviewed
+        db.notificationDao().insert(
+            NotificationEntity(
+                type      = "scan_complete",
+                title     = "Your analysis is ready",
+                body      = "Tap to view your face analysis results",
+                timestamp = System.currentTimeMillis()
+            )
+        )
         val currentState = appStateDao.getAppState() ?: AppStateEntity()
-        appStateDao.upsert(currentState.copy(resultsUnviewed = true))
+        appStateDao.upsert(currentState.copy(
+            resultsUnviewed = true,
+            unreadNotificationCount = currentState.unreadNotificationCount + 1
+        ))
 
         pendingImageBytes = null
 
@@ -381,19 +424,20 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         ]""".trimIndent()
 
         return GeminiFaceResult(
-            glowUpScore          = (68..92).random(),
-            faceShape            = listOf("OVAL","ROUND","HEART","SQUARE","DIAMOND","OBLONG").random(),
-            faceShapeDescription = "Your face has well-balanced proportions with naturally versatile features.",
-            skinTone             = listOf("FAIR","LIGHT","MEDIUM","TAN","DEEP").random(),
-            undertone            = listOf("WARM","COOL","NEUTRAL").random(),
-            undertoneDescription = "Your skin has a beautifully balanced mix of warm and cool tones.",
-            eyeShape             = listOf("ALMOND","ROUND","HOODED","MONOLID","UPTURNED").random(),
-            browType             = listOf("DEFINED","SPARSE","ARCHED","STRAIGHT","THICK").random(),
-            noseShape            = listOf("STRAIGHT","WIDE","NARROW","BUTTON","ROMAN").random(),
-            lipType              = listOf("FULL","THIN","BOW_SHAPED","WIDE","HEART").random(),
-            improvementAreasJson = mockAreas,
-            stepGuidesJson       = mockGuides,
-            celebrityMatchesJson = mockCelebs
+            glowUpScore             = (68..92).random(),
+            symmetryScore           = (70..92).random(),
+            faceShape               = listOf("OVAL","ROUND","HEART","SQUARE","DIAMOND","OBLONG").random(),
+            faceShapeDescription    = "Your face has well-balanced proportions with naturally versatile features.",
+            skinTone                = listOf("FAIR","LIGHT","MEDIUM","TAN","DEEP").random(),
+            undertone               = listOf("WARM","COOL","NEUTRAL").random(),
+            undertoneDescription    = "Your skin has a beautifully balanced mix of warm and cool tones.",
+            eyeShape                = listOf("ALMOND","ROUND","HOODED","MONOLID","UPTURNED").random(),
+            browType                = listOf("DEFINED","SPARSE","ARCHED","STRAIGHT","THICK").random(),
+            noseShape               = listOf("STRAIGHT","WIDE","NARROW","BUTTON","ROMAN").random(),
+            lipType                 = listOf("FULL","THIN","BOW_SHAPED","WIDE","HEART").random(),
+            improvementAreasJson    = mockAreas,
+            stepGuidesJson          = mockGuides,
+            celebrityMatchesJson    = mockCelebs
         )
     }
 

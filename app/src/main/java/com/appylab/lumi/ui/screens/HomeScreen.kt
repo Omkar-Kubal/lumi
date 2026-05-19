@@ -32,7 +32,6 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Brush
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Checkroom
@@ -102,7 +101,7 @@ private data class FeatureTile(
 private val featureTiles = listOf(
     FeatureTile(Icons.Outlined.Palette,     HRose,             Color(0xFFFFF1F2), "Color",   "Find your perfect season & tones",            "color"),
     FeatureTile(Icons.Outlined.AutoAwesome, HAmber,            Color(0xFFFFFBEB), "Glow-Up", "Personalised skincare recommendations",        "glowup"),
-    FeatureTile(Icons.Outlined.Brush,       Color(0xFFEC4899), Color(0xFFFDF2F8), "Makeup",  "Looks that enhance your features",            "makeup"),
+    FeatureTile(Icons.Outlined.Face,        Color(0xFFEC4899), Color(0xFFFDF2F8), "Feature Analysis", "In-depth analysis of your facial features", "features"),
     FeatureTile(Icons.Outlined.Checkroom,   Color(0xFF6366F1), Color(0xFFF5F3FF), "Style",   "Outfits that fit your vibe & body",           "style"),
 )
 
@@ -113,9 +112,7 @@ fun HomeScreen(
     onViewResultsClick: () -> Unit = {},
     onFeatureTileClick: (String) -> Unit = {},
     onAvatarClick: () -> Unit = {},
-    onBellClick: () -> Unit = {},
-    onUpgradeBannerClick: () -> Unit = {},
-    onExploreLooksClick: () -> Unit = {}
+    onBellClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -129,11 +126,8 @@ fun HomeScreen(
             viewModel.onBellTapped()
             onBellClick()
         },
-        onUpgradeBannerClick = onUpgradeBannerClick,
-        onUpgradeBannerDismiss = viewModel::dismissBanner,
         onBookmarkTip = viewModel::toggleBookmark,
-        onTipPageChange = viewModel::navigateTipWindow,
-        onExploreLooksClick = onExploreLooksClick
+        onTipPageChange = viewModel::navigateTipWindow
     )
 }
 
@@ -145,11 +139,8 @@ private fun HomeContent(
     onFeatureTileClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
     onBellClick: () -> Unit,
-    onUpgradeBannerClick: () -> Unit,
-    onUpgradeBannerDismiss: () -> Unit,
     onBookmarkTip: (Int) -> Unit,
-    onTipPageChange: (Int) -> Unit,
-    onExploreLooksClick: () -> Unit
+    onTipPageChange: (Int) -> Unit
 ) {
     var showComingSoonDialog by remember { mutableStateOf(false) }
 
@@ -213,8 +204,6 @@ private fun HomeContent(
 
             Spacer(Modifier.height(24.dp))
             FeatureTilesGrid(
-                tier = uiState.subscriptionTier,
-                hasScan = uiState.lastScan != null,
                 onTileClick = { key ->
                     if (key == "style") showComingSoonDialog = true
                     else onFeatureTileClick(key)
@@ -234,19 +223,6 @@ private fun HomeContent(
                 Spacer(Modifier.height(24.dp))
             }
 
-            TrendingSection(
-                looks = uiState.trendingLooks,
-                onExploreLooksClick = onExploreLooksClick
-            )
-
-            if (uiState.showUpsellBanner) {
-                Spacer(Modifier.height(16.dp))
-                UpgradeBanner(
-                    onUpgrade = onUpgradeBannerClick,
-                    onDismiss = onUpgradeBannerDismiss
-                )
-            }
-            Spacer(Modifier.height(8.dp))
         }
 
     }
@@ -543,18 +519,13 @@ private fun ScanMetric(icon: ImageVector, label: String, value: String) {
 // ── Feature tiles 2×2 grid ────────────────────────────────────────────────────
 
 @Composable
-private fun FeatureTilesGrid(
-    tier: SubscriptionTier,
-    hasScan: Boolean,
-    onTileClick: (String) -> Unit
-) {
+private fun FeatureTilesGrid(onTileClick: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         featureTiles.chunked(2).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 row.forEach { tile ->
                     FeatureTileCard(
                         tile = tile,
-                        locked = tier == SubscriptionTier.FREE,
                         modifier = Modifier.weight(1f),
                         onClick = { onTileClick(tile.key) }
                     )
@@ -567,7 +538,6 @@ private fun FeatureTilesGrid(
 @Composable
 private fun FeatureTileCard(
     tile: FeatureTile,
-    locked: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {

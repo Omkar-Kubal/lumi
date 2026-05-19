@@ -126,6 +126,9 @@ private val UNDERTONE_OPTIONS  = listOf("Warm", "Cool", "Neutral")
 fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(),
     onViewAllScans: () -> Unit = {},
+    onViewScanHistory: () -> Unit = {},
+    onViewSavedPalettes: () -> Unit = {},
+    onEditProfile: () -> Unit = {},
     onSignOut: () -> Unit = {},
     onUpgrade: () -> Unit = {}
 ) {
@@ -192,7 +195,7 @@ fun ProfileScreen(
                     ProfileHeaderCard(
                         displayName = uiState.displayName,
                         email = uiState.email,
-                        onEditClick = { viewModel.showComingSoon() }
+                        onEditClick = onEditProfile
                     )
                 }
 
@@ -214,7 +217,7 @@ fun ProfileScreen(
                     ScanHistorySection(
                         scans = uiState.recentScans,
                         isPro = isPro,
-                        onViewAll = onViewAllScans,
+                        onViewAll = onViewScanHistory,
                         onLockedTap = onUpgrade
                     )
                 }
@@ -240,7 +243,7 @@ fun ProfileScreen(
                             lockBody = "Save your seasonal color palettes with Pro.",
                             isPro = isPro,
                             modifier = Modifier.weight(1f),
-                            onViewAll = { viewModel.showComingSoon() },
+                            onViewAll = onViewSavedPalettes,
                             onUpgrade = onUpgrade
                         )
                     }

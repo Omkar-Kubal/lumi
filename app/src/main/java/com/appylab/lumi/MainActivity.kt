@@ -21,11 +21,13 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,15 +44,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.appylab.lumi.ui.screens.ChangePasswordScreen
+import com.appylab.lumi.ui.screens.ColorAnalysisScreen
+import com.appylab.lumi.ui.screens.EditProfileScreen
+import com.appylab.lumi.ui.screens.FeatureAnalysisScreen
+import com.appylab.lumi.ui.screens.GlowUpResultScreen
 import com.appylab.lumi.ui.screens.HomeScreen
 import com.appylab.lumi.ui.screens.NotificationsScreen
 import com.appylab.lumi.ui.screens.OnboardingScreen1
 import com.appylab.lumi.ui.screens.OnboardingScreen2
 import com.appylab.lumi.ui.screens.OnboardingScreen3
-import com.appylab.lumi.ui.screens.PaywallScreen
 import com.appylab.lumi.ui.screens.PlaceholderScreen
 import com.appylab.lumi.ui.screens.ProfileScreen
 import com.appylab.lumi.ui.screens.ResultScreen
+import com.appylab.lumi.ui.screens.SavedPalettesScreen
+import com.appylab.lumi.ui.screens.ScanHistoryScreen
 import com.appylab.lumi.ui.screens.ScanScreen
 import com.appylab.lumi.ui.screens.SplashScreen
 import com.appylab.lumi.ui.theme.LumiTheme
@@ -65,7 +73,9 @@ private val NavSurface = Color.White
 
 private enum class AppScreen {
     Splash, Onboarding1, Onboarding2, Onboarding3,
-    Main, Scan, Results, Profile, Notifications, Paywall, Placeholder
+    Main, Scan, Results, Profile, Notifications, Placeholder,
+    ColorAnalysis, GlowUp, FeatureAnalysis,
+    EditProfile, ScanHistory, SavedPalettes, ChangePassword
 }
 
 class MainActivity : ComponentActivity() {
@@ -83,6 +93,9 @@ class MainActivity : ComponentActivity() {
                 var screen by remember { mutableStateOf(AppScreen.Splash) }
                 var placeholderTitle by remember { mutableStateOf("") }
                 var placeholderSubtitle by remember { mutableStateOf("This screen is coming soon") }
+                var featureFaceAnalysisId by remember { mutableStateOf(0L) }
+                var historyResultId by remember { mutableStateOf<Long?>(null) }
+                var showNoScanDialog by remember { mutableStateOf(false) }
 
                 LaunchedEffect(isOnboardingComplete) {
                     when (isOnboardingComplete) {
@@ -104,8 +117,29 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = isOnboardingComplete == true && screen !in setOf(
                     AppScreen.Splash, AppScreen.Onboarding1, AppScreen.Onboarding2,
-                    AppScreen.Onboarding3, AppScreen.Scan
+                    AppScreen.Onboarding3, AppScreen.Scan,
+                    AppScreen.ColorAnalysis, AppScreen.GlowUp, AppScreen.FeatureAnalysis,
+                    AppScreen.EditProfile, AppScreen.ScanHistory, AppScreen.SavedPalettes,
+                    AppScreen.ChangePassword
                 )
+
+                if (showNoScanDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showNoScanDialog = false },
+                        title = { Text("No scan yet") },
+                        text  = { Text("Scan your face first to unlock this feature.") },
+                        confirmButton = {
+                            TextButton(onClick = { showNoScanDialog = false; screen = AppScreen.Scan }) {
+                                Text("Scan Now")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showNoScanDialog = false }) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     when {
@@ -129,23 +163,31 @@ class MainActivity : ComponentActivity() {
                         )
 
                         screen == AppScreen.Main -> HomeScreen(
-                            onStartScanClick     = { screen = AppScreen.Scan },
-                            onViewResultsClick   = {
+                            onStartScanClick   = { screen = AppScreen.Scan },
+                            onViewResultsClick = {
                                 homeViewModel.clearResultsBadge()
                                 screen = AppScreen.Results
                             },
-                            onFeatureTileClick   = { key ->
+                            onFeatureTileClick = { key ->
+                                val lastId = homeUiState.lastScan?.id
                                 when (key) {
-                                    "color"  -> goPlaceholder("Color Analysis", "Discover your perfect colour season and palette.")
-                                    "glowup" -> goPlaceholder("Glow-Up", "Personalised skincare recommendations are on their way.")
-                                    "makeup" -> goPlaceholder("Makeup", "Looks crafted to enhance your unique features.")
-                                    else     -> goPlaceholder(key.replaceFirstChar { it.uppercase() })
+                                    "color" -> {
+                                        if (lastId != null) { featureFaceAnalysisId = lastId; screen = AppScreen.ColorAnalysis }
+                                        else showNoScanDialog = true
+                                    }
+                                    "glowup" -> {
+                                        if (lastId != null) { featureFaceAnalysisId = lastId; screen = AppScreen.GlowUp }
+                                        else showNoScanDialog = true
+                                    }
+                                    "features" -> {
+                                        if (lastId != null) { featureFaceAnalysisId = lastId; screen = AppScreen.FeatureAnalysis }
+                                        else showNoScanDialog = true
+                                    }
+                                    else -> goPlaceholder(key.replaceFirstChar { it.uppercase() })
                                 }
                             },
-                            onAvatarClick        = { screen = AppScreen.Profile },
-                            onBellClick          = { screen = AppScreen.Notifications },
-                            onUpgradeBannerClick = { screen = AppScreen.Paywall },
-                            onExploreLooksClick  = { goPlaceholder("Explore Looks", "A curated looks feed is coming soon.") }
+                            onAvatarClick = { screen = AppScreen.Profile },
+                            onBellClick   = { screen = AppScreen.Notifications }
                         )
 
                         screen == AppScreen.Scan -> ScanScreen(
@@ -157,15 +199,17 @@ class MainActivity : ComponentActivity() {
                         )
 
                         screen == AppScreen.Results -> ResultScreen(
-                            onBack    = { screen = AppScreen.Main },
-                            onRescan  = { screen = AppScreen.Scan },
-                            onPaywall = { _ -> screen = AppScreen.Paywall }
+                            faceAnalysisId = historyResultId,
+                            onBack   = { historyResultId = null; screen = AppScreen.Main },
+                            onRescan = { historyResultId = null; screen = AppScreen.Scan }
                         )
 
                         screen == AppScreen.Profile -> ProfileScreen(
-                            onViewAllScans = { screen = AppScreen.Results },
-                            onSignOut      = { /* LaunchedEffect(isOnboardingComplete) handles redirect */ },
-                            onUpgrade      = { screen = AppScreen.Paywall }
+                            onViewAllScans      = { screen = AppScreen.Results },
+                            onViewScanHistory   = { screen = AppScreen.ScanHistory },
+                            onViewSavedPalettes = { screen = AppScreen.SavedPalettes },
+                            onEditProfile       = { screen = AppScreen.EditProfile },
+                            onSignOut           = { /* LaunchedEffect(isOnboardingComplete) handles redirect */ }
                         )
 
                         screen == AppScreen.Notifications -> NotificationsScreen(
@@ -173,8 +217,38 @@ class MainActivity : ComponentActivity() {
                             onOpen = { homeViewModel.onBellTapped() }
                         )
 
-                        screen == AppScreen.Paywall -> PaywallScreen(
+                        screen == AppScreen.ColorAnalysis -> ColorAnalysisScreen(
+                            faceAnalysisId = featureFaceAnalysisId,
                             onBack = { screen = AppScreen.Main }
+                        )
+
+                        screen == AppScreen.GlowUp -> GlowUpResultScreen(
+                            faceAnalysisId = featureFaceAnalysisId,
+                            onBack = { screen = AppScreen.Main }
+                        )
+
+                        screen == AppScreen.FeatureAnalysis -> FeatureAnalysisScreen(
+                            faceAnalysisId = featureFaceAnalysisId,
+                            onBack = { screen = AppScreen.Main }
+                        )
+
+                        screen == AppScreen.EditProfile -> EditProfileScreen(
+                            onBack = { screen = AppScreen.Profile },
+                            onChangePasswordClick = { screen = AppScreen.ChangePassword }
+                        )
+
+                        screen == AppScreen.ChangePassword -> ChangePasswordScreen(
+                            onBack = { screen = AppScreen.EditProfile }
+                        )
+
+                        screen == AppScreen.ScanHistory -> ScanHistoryScreen(
+                            onBack = { screen = AppScreen.Profile },
+                            onOpenResult = { id -> historyResultId = id; screen = AppScreen.Results }
+                        )
+
+                        screen == AppScreen.SavedPalettes -> SavedPalettesScreen(
+                            onBack = { screen = AppScreen.Profile },
+                            onOpenColorAnalysis = { id -> featureFaceAnalysisId = id; screen = AppScreen.ColorAnalysis }
                         )
 
                         screen == AppScreen.Placeholder -> PlaceholderScreen(

@@ -12,4 +12,10 @@ interface UserProfileDao {
 
     @Upsert
     suspend fun upsert(profile: UserProfileEntity)
+
+    @Query("UPDATE user_profile SET passwordHash = :hash WHERE id = 1")
+    suspend fun updatePasswordHash(hash: String)
+
+    @Query("SELECT passwordHash FROM user_profile WHERE id = 1")
+    suspend fun getPasswordHash(): String?
 }

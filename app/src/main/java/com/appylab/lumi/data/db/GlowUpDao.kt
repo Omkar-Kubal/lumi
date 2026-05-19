@@ -23,4 +23,10 @@ interface GlowUpDao {
         "WHERE faceAnalysisId = :faceAnalysisId"
     )
     suspend fun updateImageStatus(faceAnalysisId: Long, url: String?, status: String)
+
+    @Query("SELECT faceAnalysisId FROM glow_up")
+    fun observeAllFaceAnalysisIds(): Flow<List<Long>>
+
+    @Query("DELETE FROM glow_up WHERE faceAnalysisId = :faceAnalysisId")
+    suspend fun deleteByFaceAnalysisId(faceAnalysisId: Long)
 }

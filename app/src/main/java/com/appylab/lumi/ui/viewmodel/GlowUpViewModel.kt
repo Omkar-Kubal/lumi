@@ -67,14 +67,7 @@ class GlowUpViewModel(application: Application) : AndroidViewModel(application) 
 
     fun load(faceAnalysisId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            // 1. Entitlement check — FREE users blocked
-            val tier = repository.getSubscriptionTier()
-            if (tier == SubscriptionTier.FREE) {
-                _uiState.update { it.copy(isLoading = false, error = GlowUpError.AccessDenied) }
-                return@launch
-            }
-
-            // 2. Score history for progress chart (one-shot, before Flow observe)
+            // 1. Score history for progress chart (one-shot, before Flow observe)
             val history = repository.getScoreHistory()
             val progressData = history
             val scoreDelta = if (history.size >= 2)

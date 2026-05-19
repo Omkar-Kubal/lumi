@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appylab.lumi.data.api.GeminiService
+import com.appylab.lumi.data.db.AppStateEntity
 import com.appylab.lumi.data.db.LumiDatabase
+import com.appylab.lumi.data.db.NotificationEntity
 import com.appylab.lumi.data.model.GlowUpImageStatus
 import java.io.File
 import java.io.FileOutputStream
@@ -39,8 +41,10 @@ class GlowUpImageWorker(
         val faceAnalysisId = inputData.getLong(KEY_FACE_ANALYSIS_ID, -1L)
         if (faceAnalysisId == -1L) return Result.failure()
 
-        val db        = LumiDatabase.getInstance(applicationContext)
-        val glowUpDao = db.glowUpDao()
+        val db             = LumiDatabase.getInstance(applicationContext)
+        val glowUpDao      = db.glowUpDao()
+        val notifDao       = db.notificationDao()
+        val appStateDao    = db.appStateDao()
         val entity    = glowUpDao.getByFaceAnalysisId(faceAnalysisId) ?: return Result.failure()
 
         // Signal UI that generation has started
@@ -63,6 +67,16 @@ class GlowUpImageWorker(
                 url            = outputFile.absolutePath,
                 status         = GlowUpImageStatus.COMPLETE.name
             )
+            notifDao.insert(
+                NotificationEntity(
+                    type      = "glow_up_ready",
+                    title     = "Your glow-up is ready",
+                    body      = "See your personalised glow-up image and tips",
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            val state = appStateDao.getAppState() ?: AppStateEntity()
+            appStateDao.upsert(state.copy(unreadNotificationCount = state.unreadNotificationCount + 1))
             Result.success()
         } catch (e: Exception) {
             glowUpDao.updateImageStatus(

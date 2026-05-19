@@ -89,7 +89,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             skinTone = profile?.skinTonePref.orEmpty(),
             undertone = profile?.undertonePref.orEmpty(),
             location = profile?.location.orEmpty(),
-            subscriptionTier = if (state.subscriptionTier == "PRO") SubscriptionTier.PRO else SubscriptionTier.FREE,
+            subscriptionTier = SubscriptionTier.PRO,
             recentScans = scans,
             notifScanReminders = state.notifScanReminders,
             notifPromotions = state.notifPromotions,

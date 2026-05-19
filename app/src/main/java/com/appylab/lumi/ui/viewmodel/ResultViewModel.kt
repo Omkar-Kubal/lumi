@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,9 +52,17 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
     )
 
     private val _isGeneratingShare = MutableStateFlow(false)
+    private val _specificId = MutableStateFlow<Long?>(null)
+
+    private val effectiveAnalysis = _specificId.flatMapLatest { id ->
+        if (id != null) flow { emit(repository.getAnalysisById(id)) }
+        else repository.observeLatestAnalysis()
+    }
+
+    fun setSpecificId(id: Long?) { _specificId.value = id }
 
     val uiState: StateFlow<ResultUiState> = combine(
-        repository.observeLatestAnalysis(),
+        effectiveAnalysis,
         repository.observeSubscriptionTier(),
         _isGeneratingShare
     ) { analysis, tier, generating ->
@@ -66,7 +76,7 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
             ResultUiState(
                 isLoading = false,
                 analysis = analysis,
-                subscriptionTier = tier,
+                subscriptionTier = SubscriptionTier.PRO,
                 glowUpPotential = glowUpPotentialFrom(score),
                 verdictLabel = verdictLabelFrom(score),
                 verdictBody = verdictBodyFrom(score),
@@ -81,7 +91,7 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
 
     fun shareResult(context: Context) {
         val analysis = uiState.value.analysis ?: return
-        val isPro = uiState.value.subscriptionTier == SubscriptionTier.PRO
+        val isPro = true
 
         viewModelScope.launch(Dispatchers.Default) {
             _isGeneratingShare.update { true }
