@@ -16,10 +16,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         GlowUpEntity::class,
         ColorAnalysisEntity::class,
         FeatureDetailEntity::class,
-        NotificationEntity::class,
-        OnboardingProgressEntity::class
+        NotificationEntity::class
     ],
-    version = 13,
+    version = 14,
     exportSchema = false
 )
 abstract class LumiDatabase : RoomDatabase() {
@@ -31,7 +30,6 @@ abstract class LumiDatabase : RoomDatabase() {
     abstract fun colorAnalysisDao(): ColorAnalysisDao
     abstract fun featureDetailDao(): FeatureDetailDao
     abstract fun notificationDao(): NotificationDao
-    abstract fun onboardingProgressDao(): OnboardingProgressDao
 
     companion object {
         @Volatile
@@ -197,6 +195,12 @@ abstract class LumiDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DROP TABLE IF EXISTS onboarding_progress")
+            }
+        }
+
         fun getInstance(context: Context): LumiDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -208,7 +212,8 @@ abstract class LumiDatabase : RoomDatabase() {
                         MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
                         MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
                         MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13
+                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
+                        MIGRATION_13_14
                     )
                     .build()
                     .also { instance = it }

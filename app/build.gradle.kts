@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+    implementation("com.caverock:androidsvg-aar:1.4")
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
