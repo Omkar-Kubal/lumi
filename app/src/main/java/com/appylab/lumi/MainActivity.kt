@@ -60,6 +60,14 @@ import com.appylab.lumi.ui.screens.ScanScreen
 import com.appylab.lumi.ui.screens.SplashScreen
 import com.appylab.lumi.ui.theme.LumiTheme
 import com.appylab.lumi.ui.screens.LoginScreen
+import com.appylab.lumi.ui.screens.Onboarding1Screen
+import com.appylab.lumi.ui.screens.Onboarding2Screen
+import com.appylab.lumi.ui.screens.Onboarding3Screen
+import com.appylab.lumi.ui.screens.Onboarding4Screen
+import com.appylab.lumi.ui.screens.Onboarding5Screen
+import com.appylab.lumi.ui.screens.Onboarding6Screen
+import com.appylab.lumi.ui.screens.Onboarding7Screen
+import com.appylab.lumi.ui.screens.Onboarding8Screen
 import com.appylab.lumi.ui.viewmodel.HomeViewModel
 import com.appylab.lumi.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.delay
@@ -70,6 +78,8 @@ private val NavSurface = Color.White
 
 private enum class AppScreen {
     Splash,
+    Onboarding1, Onboarding2, Onboarding3, Onboarding4, Onboarding5, Onboarding6, Onboarding7,
+    Onboarding8,
     Login,
     Main, Scan, Results, Profile, Notifications, Placeholder,
     ColorAnalysis, GlowUp, FeatureAnalysis,
@@ -95,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     delay(3_000L)
-                    screen = AppScreen.Main
+                    screen = AppScreen.Onboarding1
                 }
 
                 fun goPlaceholder(title: String, subtitle: String = "This screen is coming soon") {
@@ -106,6 +116,9 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = screen !in setOf(
                     AppScreen.Splash,
+                    AppScreen.Onboarding1, AppScreen.Onboarding2, AppScreen.Onboarding3,
+                    AppScreen.Onboarding4, AppScreen.Onboarding5, AppScreen.Onboarding6,
+                    AppScreen.Onboarding7, AppScreen.Onboarding8,
                     AppScreen.Login,
                     AppScreen.Scan,
                     AppScreen.ColorAnalysis, AppScreen.GlowUp, AppScreen.FeatureAnalysis,
@@ -134,6 +147,49 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.fillMaxSize()) {
                     when (screen) {
                         AppScreen.Splash -> SplashScreen()
+
+                        AppScreen.Onboarding1 -> Onboarding1Screen(
+                            onNext = { screen = AppScreen.Onboarding2 },
+                            onSkip = { screen = AppScreen.Login }
+                        )
+
+                        AppScreen.Onboarding2 -> Onboarding2Screen(
+                            onBack = { screen = AppScreen.Onboarding1 },
+                            onNext = { screen = AppScreen.Onboarding3 }
+                        )
+
+                        AppScreen.Onboarding3 -> Onboarding3Screen(
+                            onBack = { screen = AppScreen.Onboarding2 },
+                            onNext = { screen = AppScreen.Onboarding4 }
+                        )
+
+                        AppScreen.Onboarding4 -> Onboarding4Screen(
+                            onBack = { screen = AppScreen.Onboarding3 },
+                            onNext = { screen = AppScreen.Onboarding5 }
+                        )
+
+                        AppScreen.Onboarding5 -> Onboarding5Screen(
+                            onBack = { screen = AppScreen.Onboarding4 },
+                            onNext = { screen = AppScreen.Onboarding6 }
+                        )
+
+                        AppScreen.Onboarding6 -> Onboarding6Screen(
+                            onBack = { screen = AppScreen.Onboarding5 },
+                            onNext = { _, _, _ -> screen = AppScreen.Onboarding7 }
+                        )
+
+                        AppScreen.Onboarding7 -> Onboarding7Screen(
+                            onBack           = { screen = AppScreen.Onboarding6 },
+                            onContinueGoogle = { screen = AppScreen.Onboarding8 },
+                            onContinueEmail  = { screen = AppScreen.Onboarding8 },
+                            onSkipToHome     = { screen = AppScreen.Main },
+                            onContinue       = { screen = AppScreen.Onboarding8 }
+                        )
+
+                        AppScreen.Onboarding8 -> Onboarding8Screen(
+                            onStartScan    = { screen = AppScreen.Main },
+                            onExploreFirst = { screen = AppScreen.Main }
+                        )
 
                         AppScreen.Login -> LoginScreen(
                             viewModel = loginViewModel,
