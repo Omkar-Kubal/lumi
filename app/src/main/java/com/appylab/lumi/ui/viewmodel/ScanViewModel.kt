@@ -101,9 +101,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     /** Validated, compressed JPEG bytes held between capture validation and analysis. */
     private var pendingImageBytes: ByteArray? = null
 
-    private var autoCaptureDisabled    = false
-    private var autoCapturePendingJob: Job? = null
-    private var analysisJob: Job?           = null
+    private var analysisJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -123,38 +121,16 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onFrameValidation(state: FrameValidationState) {
         _uiState.update { it.copy(frameValidation = state) }
-        if (autoCaptureDisabled) return
-
-        if (state.allPassed) {
-            if (autoCapturePendingJob == null || autoCapturePendingJob?.isActive == false) {
-                autoCapturePendingJob = viewModelScope.launch {
-                    delay(1500)
-                    if (_uiState.value.frameValidation.allPassed && !autoCaptureDisabled) onCapture()
-                }
-            }
-        } else {
-            autoCapturePendingJob?.cancel()
-            autoCapturePendingJob = null
-        }
     }
 
+    /** Check daily limit and surface the DailyLimitReached error if needed. */
     fun onCapture() {
         if (_uiState.value.isLoading) return
-
         val currentCount = _uiState.value.scanCount
         if (currentCount >= DAILY_SCAN_LIMIT) {
             _uiState.update { it.copy(error = ScanError.DailyLimitReached) }
-            return
         }
-
-        viewModelScope.launch {
-            val today    = LocalDate.now().toString()
-            val appState = appStateDao.getAppState() ?: AppStateEntity()
-            val newCount = currentCount + 1
-            appStateDao.upsert(appState.copy(scanCountToday = newCount, scanCountDate = today))
-            _uiState.update { it.copy(scanCount = newCount) }
-            startAnalysis()
-        }
+        // Count increment and analysis start happen in onCaptureValidated(), after image validation.
     }
 
     /**
@@ -445,17 +421,8 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     fun cancelAnalysis() {
         analysisJob?.cancel()
         analysisJob = null
-        autoCaptureDisabled = true
-        autoCapturePendingJob?.cancel()
-        autoCapturePendingJob = null
         pendingImageBytes = null
         _uiState.update { it.copy(isLoading = false, showCancelButton = false) }
-    }
-
-    fun onAutoCaptureDisabledByCancel() {
-        autoCaptureDisabled = true
-        autoCapturePendingJob?.cancel()
-        autoCapturePendingJob = null
     }
 
     fun selectScanType(type: ScanType) {

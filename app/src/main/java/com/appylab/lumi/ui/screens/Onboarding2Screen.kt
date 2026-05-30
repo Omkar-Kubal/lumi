@@ -77,11 +77,10 @@ fun Onboarding2Screen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState()),
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ── Top bar ────────────────────────────────────────────────────
+            // ── Fixed top bar ──────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,161 +109,167 @@ fun Onboarding2Screen(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
-
-            // ── Headline ───────────────────────────────────────────────────
-            Text(
-                text = "One scan. Everything changes.",
-                style = TextStyle(
-                    fontFamily = PoppinsFont,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Ob2Text,
-                    textAlign = TextAlign.Start,
-                    lineHeight = 32.sp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            // ── Feature grid 2×2 ──────────────────────────────────────────
+            // ── Scrollable content ─────────────────────────────────────────
             Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    FeatureTile(
-                        modifier = Modifier.weight(1f),
-                        title = "Face & Skin Analysis",
-                        description = "Know your features inside out",
-                        drawIcon = { drawFaceIcon(Ob2Rose) }
-                    )
-                    FeatureTile(
-                        modifier = Modifier.weight(1f),
-                        title = "AI Glow-Up Score",
-                        description = "Track your progress over time",
-                        drawIcon = { drawSparkleIcon(Ob2Rose) }
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    FeatureTile(
-                        modifier = Modifier.weight(1f),
-                        title = "Color Season",
-                        description = "Wear what actually suits you",
-                        drawIcon = { drawColorSeasonIcon(Ob2Rose) }
-                    )
-                    FeatureTile(
-                        modifier = Modifier.weight(1f),
-                        title = "Feature Detail",
-                        description = "Understand every detail of your face",
-                        drawIcon = { drawEyeIcon(Ob2Rose) }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ── Quote card ─────────────────────────────────────────────────
-            Box(
                 modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Ob2RoseCard)
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
-                    Text(
-                        text = "\u201C\u201C",
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Ob2Rose,
-                            lineHeight = 18.sp
-                        )
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Beauty isn\u2019t one size.\nIt never was.",
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Ob2Text,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            append("— Lumi ")
-                            withStyle(SpanStyle(color = Ob2Rose)) { append("\u2736") }
-                        },
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontStyle = FontStyle.Italic,
-                            color = Ob2Muted,
-                            textAlign = TextAlign.Center
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
+                Spacer(Modifier.height(12.dp))
 
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(20.dp))
-
-            // ── Page dots ──────────────────────────────────────────────────
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(OB2_TOTAL) { index ->
-                    val isActive = index == OB2_CURRENT
-                    Box(
-                        modifier = Modifier
-                            .size(if (isActive) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(if (isActive) Ob2Rose else Ob2DotInactive)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ── CTA button ─────────────────────────────────────────────────
-            Button(
-                onClick = onNext,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Ob2Text,
-                    contentColor = Color.White
-                )
-            ) {
+                // ── Headline ───────────────────────────────────────────────
                 Text(
-                    text = "Sounds good  \u2192",
+                    text = "One scan. Everything changes.",
                     style = TextStyle(
                         fontFamily = PoppinsFont,
-                        fontSize = 15.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.2.sp
-                    )
+                        color = Ob2Text,
+                        textAlign = TextAlign.Start,
+                        lineHeight = 32.sp
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
                 )
+
+                Spacer(Modifier.height(24.dp))
+
+                // ── Feature grid 2×2 ──────────────────────────────────────
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        FeatureTile(
+                            modifier = Modifier.weight(1f),
+                            title = "Face & Skin Analysis",
+                            description = "Know your features inside out",
+                            drawIcon = { drawFaceIcon(Ob2Rose) }
+                        )
+                        FeatureTile(
+                            modifier = Modifier.weight(1f),
+                            title = "AI Glow-Up Score",
+                            description = "Track your progress over time",
+                            drawIcon = { drawSparkleIcon(Ob2Rose) }
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        FeatureTile(
+                            modifier = Modifier.weight(1f),
+                            title = "Color Season",
+                            description = "Wear what actually suits you",
+                            drawIcon = { drawColorSeasonIcon(Ob2Rose) }
+                        )
+                        FeatureTile(
+                            modifier = Modifier.weight(1f),
+                            title = "Feature Detail",
+                            description = "Understand every detail of your face",
+                            drawIcon = { drawEyeIcon(Ob2Rose) }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Quote card ─────────────────────────────────────────────
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Ob2RoseCard)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "\u201C\u201C",
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Ob2Rose,
+                                lineHeight = 18.sp
+                            )
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Beauty isn\u2019t one size.\nIt never was.",
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Ob2Text,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 22.sp
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                append("— Lumi ")
+                                withStyle(SpanStyle(color = Ob2Rose)) { append("\u2736") }
+                            },
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontStyle = FontStyle.Italic,
+                                color = Ob2Muted,
+                                textAlign = TextAlign.Center
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
             }
 
-            Spacer(Modifier.height(24.dp))
+            // ── Fixed bottom nav ───────────────────────────────────────────
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(OB2_TOTAL) { index ->
+                        val isActive = index == OB2_CURRENT
+                        Box(
+                            modifier = Modifier
+                                .size(if (isActive) 8.dp else 6.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) Ob2Rose else Ob2DotInactive)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = onNext,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Ob2Text,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Sounds good  \u2192",
+                        style = TextStyle(
+                            fontFamily = PoppinsFont,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.2.sp
+                        )
+                    )
+                }
+                Spacer(Modifier.height(24.dp))
+            }
         }
     }
 }

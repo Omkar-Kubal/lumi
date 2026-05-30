@@ -129,24 +129,6 @@ private val SDark    = Color(0xFF0A0A0A)
 private val SChipBg  = Color(0xFF1C1C1C).copy(alpha = 0.85f)
 private val SAmber   = Color(0xFFFBBF24)
 
-// ── Static facial landmark dot positions (normalised within oval 0..1) ────────
-private val faceLandmarkDots = listOf(
-    0.50f to 0.10f, 0.36f to 0.14f, 0.64f to 0.14f,
-    0.26f to 0.22f, 0.74f to 0.22f,
-    0.16f to 0.33f, 0.84f to 0.33f,
-    0.28f to 0.32f, 0.35f to 0.29f, 0.42f to 0.31f, 0.35f to 0.36f,
-    0.58f to 0.31f, 0.65f to 0.29f, 0.72f to 0.32f, 0.65f to 0.36f,
-    0.50f to 0.38f, 0.50f to 0.45f, 0.50f to 0.52f,
-    0.43f to 0.50f, 0.57f to 0.50f,
-    0.22f to 0.46f, 0.78f to 0.46f,
-    0.18f to 0.54f, 0.82f to 0.54f,
-    0.43f to 0.60f, 0.50f to 0.58f, 0.57f to 0.60f,
-    0.44f to 0.66f, 0.50f to 0.68f, 0.56f to 0.66f,
-    0.50f to 0.76f, 0.42f to 0.73f, 0.58f to 0.73f,
-    0.30f to 0.65f, 0.70f to 0.65f,
-    0.22f to 0.60f, 0.78f to 0.60f,
-)
-
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 @Composable
@@ -317,7 +299,6 @@ private fun ScanContent(
                     .fillMaxWidth()
             ) {
                 FaceOverlayCanvas(
-                    faceDetected = frameValidation.faceDetected,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -651,20 +632,8 @@ private fun CameraPreviewWithAnalysis(
 
 @Composable
 private fun FaceOverlayCanvas(
-    faceDetected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "dot_pulse")
-    val dotAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.35f,
-        targetValue = 0.85f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "dot_alpha"
-    )
-
     androidx.compose.foundation.Canvas(modifier = modifier) {
         val ovalW = size.width * 0.60f
         val ovalH = size.height * 0.56f
@@ -696,23 +665,6 @@ private fun FaceOverlayCanvas(
             color = ovalColor.copy(alpha = 0.80f),
             style = Stroke(width = 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 7f)))
         )
-
-        // Landmark dots — shown only when face is detected
-        if (faceDetected) {
-            faceLandmarkDots.forEach { (nx, ny) ->
-                val dx = (nx - 0.5f) * 2f
-                val dy = (ny - 0.5f) * 2f
-                if (dx * dx + dy * dy <= 1.05f) {
-                    val isKeyFeature = (nx == 0.50f && ny == 0.52f) // nose tip
-                        || (nx == 0.43f && ny == 0.60f) || (nx == 0.57f && ny == 0.60f) // mouth corners
-                    drawCircle(
-                        color = (if (isKeyFeature) SRose else SWhite).copy(alpha = dotAlpha),
-                        radius = 2.8.dp.toPx(),
-                        center = Offset(ovalLeft + nx * ovalW, ovalTop + ny * ovalH)
-                    )
-                }
-            }
-        }
     }
 }
 

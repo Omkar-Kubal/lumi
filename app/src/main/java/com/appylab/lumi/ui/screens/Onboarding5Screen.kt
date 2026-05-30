@@ -158,9 +158,8 @@ fun Onboarding5Screen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .verticalScroll(rememberScrollState())
         ) {
-            // ── Back + step bar ────────────────────────────────────────────
+            // ── Fixed top bar ──────────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +178,6 @@ fun Onboarding5Screen(
                 StepProgressBar(modifier = Modifier.weight(1f))
             }
 
-            // ── Step caption ───────────────────────────────────────────────
             Text(
                 text = "Let\u2019s personalise LUMI for you. 30 seconds.",
                 style = TextStyle(
@@ -194,146 +192,150 @@ fun Onboarding5Screen(
                     .padding(horizontal = 24.dp)
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(8.dp))
 
-            // ── Section 1: Beauty goals ────────────────────────────────────
-            SectionHeader(
-                title = "What are your beauty goals?",
-                subtitle = "Select all that apply",
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
+            // ── Scrollable content ─────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(12.dp))
+                // ── Section 1: Beauty goals ────────────────────────────────
+                SectionHeader(
+                    title = "What are your beauty goals?",
+                    subtitle = "Select all that apply",
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
 
-            SelectionGrid(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                items = BeautyGoal.entries,
-                selectedItems = selectedGoals,
-                label = { it.label },
-                emoji = { it.emoji },
-                onToggle = { goal ->
-                    if (goal == BeautyGoal.AllAbove) {
-                        if (BeautyGoal.AllAbove in selectedGoals) {
-                            selectedGoals.clear()
+                Spacer(Modifier.height(12.dp))
+
+                SelectionGrid(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    items = BeautyGoal.entries,
+                    selectedItems = selectedGoals,
+                    label = { it.label },
+                    emoji = { it.emoji },
+                    onToggle = { goal ->
+                        if (goal == BeautyGoal.AllAbove) {
+                            if (BeautyGoal.AllAbove in selectedGoals) {
+                                selectedGoals.clear()
+                            } else {
+                                selectedGoals.clear()
+                                selectedGoals.addAll(BeautyGoal.entries)
+                            }
                         } else {
-                            selectedGoals.clear()
-                            selectedGoals.addAll(BeautyGoal.entries)
+                            if (goal in selectedGoals) selectedGoals.remove(goal)
+                            else selectedGoals.add(goal)
                         }
-                    } else {
-                        if (goal in selectedGoals) selectedGoals.remove(goal)
-                        else selectedGoals.add(goal)
                     }
-                }
-            )
+                )
 
-            Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(24.dp))
 
-            // ── Section 2: Skin concerns ───────────────────────────────────
-            SectionHeader(
-                title = "What are your skin concerns?",
-                subtitle = "Select all that apply \u2014 no judgement here.",
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
+                // ── Section 2: Skin concerns ───────────────────────────────
+                SectionHeader(
+                    title = "What are your skin concerns?",
+                    subtitle = "Select all that apply \u2014 no judgement here.",
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
 
-            Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-            SelectionGrid(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                items = SkinConcern.entries,
-                selectedItems = selectedConcerns,
-                label = { it.label },
-                emoji = { it.emoji },
-                onToggle = { concern ->
-                    if (concern in selectedConcerns) selectedConcerns.remove(concern)
-                    else selectedConcerns.add(concern)
-                }
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = "Every skin type is valid. Every concern is common.",
-                style = TextStyle(
-                    fontFamily = PoppinsFont,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontStyle = FontStyle.Italic,
-                    color = Ob5Muted,
-                    textAlign = TextAlign.Center
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
-            )
-
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(20.dp))
-
-            // ── Page dots ──────────────────────────────────────────────────
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    repeat(OB5_TOTAL) { index ->
-                        val isActive = index == OB5_CURRENT
-                        Box(
-                            modifier = Modifier
-                                .size(if (isActive) 8.dp else 6.dp)
-                                .clip(CircleShape)
-                                .background(if (isActive) Ob5Rose else Ob5DotInactive)
-                        )
+                SelectionGrid(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    items = SkinConcern.entries,
+                    selectedItems = selectedConcerns,
+                    label = { it.label },
+                    emoji = { it.emoji },
+                    onToggle = { concern ->
+                        if (concern in selectedConcerns) selectedConcerns.remove(concern)
+                        else selectedConcerns.add(concern)
                     }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // ── CTA button ─────────────────────────────────────────────────
-            Button(
-                onClick = { onNext() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Ob5Text,
-                    contentColor = Color.White
                 )
-            ) {
-                Text(
-                    text = "Continue  \u2192",
-                    style = TextStyle(
-                        fontFamily = PoppinsFont,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.2.sp
-                    )
-                )
-            }
 
-            Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
 
-            // Validation hint
-            if (selectedGoals.isEmpty()) {
                 Text(
-                    text = "At least one goal required",
+                    text = "Every skin type is valid. Every concern is common.",
                     style = TextStyle(
                         fontFamily = PoppinsFont,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Normal,
+                        fontStyle = FontStyle.Italic,
                         color = Ob5Muted,
                         textAlign = TextAlign.Center
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)
                 )
+
+                Spacer(Modifier.height(12.dp))
             }
 
-            Spacer(Modifier.height(16.dp))
+            // ── Fixed bottom nav ───────────────────────────────────────────
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        repeat(OB5_TOTAL) { index ->
+                            val isActive = index == OB5_CURRENT
+                            Box(
+                                modifier = Modifier
+                                    .size(if (isActive) 8.dp else 6.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isActive) Ob5Rose else Ob5DotInactive)
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = { onNext() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Ob5Text,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Continue  \u2192",
+                        style = TextStyle(
+                            fontFamily = PoppinsFont,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.2.sp
+                        )
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                if (selectedGoals.isEmpty()) {
+                    Text(
+                        text = "At least one goal required",
+                        style = TextStyle(
+                            fontFamily = PoppinsFont,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Ob5Muted,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+            }
         }
     }
 }

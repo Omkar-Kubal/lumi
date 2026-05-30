@@ -98,11 +98,10 @@ fun Onboarding7Screen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState()),
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ── Top bar ────────────────────────────────────────────────────
+            // ── Fixed top bar ──────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -131,6 +130,13 @@ fun Onboarding7Screen(
                 )
             }
 
+            // ── Scrollable content ─────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Spacer(Modifier.height(12.dp))
 
             // ── Headline ───────────────────────────────────────────────────
@@ -338,77 +344,73 @@ fun Onboarding7Screen(
                 }
             }
 
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
+            } // end scrollable content
 
-            // ── Page dots ──────────────────────────────────────────────────
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(OB7_TOTAL) { index ->
-                    val isActive = index == OB7_CURRENT
-                    Box(
-                        modifier = Modifier
-                            .size(if (isActive) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(if (isActive) Ob7Rose else Ob7DotInactive)
+            // ── Fixed bottom nav ───────────────────────────────────────────
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(OB7_TOTAL) { index ->
+                        val isActive = index == OB7_CURRENT
+                        Box(
+                            modifier = Modifier
+                                .size(if (isActive) 8.dp else 6.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) Ob7Rose else Ob7DotInactive)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = onContinue,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Ob7Text,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Continue  \u2192",
+                        style = TextStyle(
+                            fontFamily = PoppinsFont,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.2.sp
+                        )
                     )
                 }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // ── CTA button ─────────────────────────────────────────────────
-            Button(
-                onClick = onContinue,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Ob7Text,
-                    contentColor = Color.White
-                )
-            ) {
+                Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "Continue  \u2192",
+                    text = buildAnnotatedString {
+                        append("By continuing, you agree to our ")
+                        withStyle(SpanStyle(color = Ob7Rose, fontWeight = FontWeight.Medium)) {
+                            append("Terms of Use")
+                        }
+                        append(" and acknowledge our ")
+                        withStyle(SpanStyle(color = Ob7Rose, fontWeight = FontWeight.Medium)) {
+                            append("Privacy Policy")
+                        }
+                    },
                     style = TextStyle(
                         fontFamily = PoppinsFont,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.2.sp
-                    )
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Ob7Muted,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 15.sp
+                    ),
+                    modifier = Modifier.padding(horizontal = 32.dp)
                 )
+                Spacer(Modifier.height(16.dp))
             }
-
-            Spacer(Modifier.height(10.dp))
-
-            // ── ToS footer ─────────────────────────────────────────────────
-            Text(
-                text = buildAnnotatedString {
-                    append("By continuing, you agree to our ")
-                    withStyle(SpanStyle(color = Ob7Rose, fontWeight = FontWeight.Medium)) {
-                        append("Terms of Use")
-                    }
-                    append(" and acknowledge our ")
-                    withStyle(SpanStyle(color = Ob7Rose, fontWeight = FontWeight.Medium)) {
-                        append("Privacy Policy")
-                    }
-                },
-                style = TextStyle(
-                    fontFamily = PoppinsFont,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Ob7Muted,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 15.sp
-                ),
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
-
-            Spacer(Modifier.height(16.dp))
         }
     }
 }

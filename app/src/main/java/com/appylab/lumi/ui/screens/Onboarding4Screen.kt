@@ -96,11 +96,10 @@ fun Onboarding4Screen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState()),
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ── Top bar ────────────────────────────────────────────────────
+            // ── Fixed top bar ──────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -129,188 +128,185 @@ fun Onboarding4Screen(
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // ── Headline ───────────────────────────────────────────────────
-            Text(
-                text = "50,000+ women have discovered their best look",
-                style = TextStyle(
-                    fontFamily = PoppinsFont,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Ob4Text,
-                    lineHeight = 34.sp,
-                    textAlign = TextAlign.Start
-                ),
+            // ── Scrollable content ─────────────────────────────────────────
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            // ── Testimonial cards ──────────────────────────────────────────
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                testimonials.forEach { t ->
-                    TestimonialCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        testimonial = t
-                    )
-                }
-            }
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(12.dp))
-
-            // ── Testimonial pager dots (3 cards indicator) ─────────────────
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(3) { index ->
-                    val isActive = index == 0
-                    Box(
-                        modifier = Modifier
-                            .size(if (isActive) 6.dp else 5.dp)
-                            .clip(CircleShape)
-                            .background(if (isActive) Ob4Rose else Ob4DotInactive)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ── Stats row ──────────────────────────────────────────────────
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                StatItem(
-                    icon = Icons.Outlined.DocumentScanner,
-                    label = "50K+ scans"
-                )
-                StatDivider()
-                StatItem(
-                    icon = Icons.Outlined.Star,
-                    label = "4.8★ rating"
-                )
-                StatDivider()
-                StatItem(
-                    icon = Icons.Outlined.AccessTime,
-                    label = "8 sec avg"
-                )
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ── Quote card ─────────────────────────────────────────────────
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Ob4RoseCard)
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "\u201C\u201C",
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Ob4Rose,
-                            lineHeight = 18.sp
-                        )
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "There\u2019s no one way to be beautiful.\nThere\u2019s only your way.",
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Ob4Text,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            append("— Lumi ")
-                            withStyle(SpanStyle(color = Ob4Rose)) { append("\u2736") }
-                        },
-                        style = TextStyle(
-                            fontFamily = PoppinsFont,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontStyle = FontStyle.Italic,
-                            color = Ob4Muted,
-                            textAlign = TextAlign.Center
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(20.dp))
-
-            // ── Page dots ──────────────────────────────────────────────────
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(OB4_TOTAL) { index ->
-                    val isActive = index == OB4_CURRENT
-                    Box(
-                        modifier = Modifier
-                            .size(if (isActive) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(if (isActive) Ob4Rose else Ob4DotInactive)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ── CTA button ─────────────────────────────────────────────────
-            Button(
-                onClick = onNext,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Ob4Text,
-                    contentColor = Color.White
-                )
-            ) {
+                // ── Headline ───────────────────────────────────────────────
                 Text(
-                    text = "I want this  \u2192",
+                    text = "50,000+ women have discovered their best look",
                     style = TextStyle(
                         fontFamily = PoppinsFont,
-                        fontSize = 15.sp,
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.2.sp
-                    )
+                        color = Ob4Text,
+                        lineHeight = 34.sp,
+                        textAlign = TextAlign.Start
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
                 )
+
+                Spacer(Modifier.height(24.dp))
+
+                // ── Testimonial cards ──────────────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    testimonials.forEach { t ->
+                        TestimonialCard(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            testimonial = t
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── Testimonial pager dots (3 cards indicator) ─────────────
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(3) { index ->
+                        val isActive = index == 0
+                        Box(
+                            modifier = Modifier
+                                .size(if (isActive) 6.dp else 5.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) Ob4Rose else Ob4DotInactive)
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Stats row ──────────────────────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StatItem(icon = Icons.Outlined.DocumentScanner, label = "50K+ scans")
+                    StatDivider()
+                    StatItem(icon = Icons.Outlined.Star, label = "4.8★ rating")
+                    StatDivider()
+                    StatItem(icon = Icons.Outlined.AccessTime, label = "8 sec avg")
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Quote card ─────────────────────────────────────────────
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Ob4RoseCard)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "\u201C\u201C",
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Ob4Rose,
+                                lineHeight = 18.sp
+                            )
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "There\u2019s no one way to be beautiful.\nThere\u2019s only your way.",
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Ob4Text,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 22.sp
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                append("— Lumi ")
+                                withStyle(SpanStyle(color = Ob4Rose)) { append("\u2736") }
+                            },
+                            style = TextStyle(
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontStyle = FontStyle.Italic,
+                                color = Ob4Muted,
+                                textAlign = TextAlign.Center
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
             }
 
-            Spacer(Modifier.height(24.dp))
+            // ── Fixed bottom nav ───────────────────────────────────────────
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(OB4_TOTAL) { index ->
+                        val isActive = index == OB4_CURRENT
+                        Box(
+                            modifier = Modifier
+                                .size(if (isActive) 8.dp else 6.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) Ob4Rose else Ob4DotInactive)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = onNext,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Ob4Text,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "I want this  \u2192",
+                        style = TextStyle(
+                            fontFamily = PoppinsFont,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.2.sp
+                        )
+                    )
+                }
+                Spacer(Modifier.height(24.dp))
+            }
         }
     }
 }
